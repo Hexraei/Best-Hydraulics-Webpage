@@ -1,0 +1,7 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#e0f2fe"/>
+  <rect x="80" y="240" width="640" height="120" rx="60" fill="#0f172a"/>
+  <circle cx="160" cy="300" r="48" fill="#94a3b8"/>
+  <circle cx="640" cy="300" r="48" fill="#94a3b8"/>
+  <text x="80" y="110" fill="#0f172a" font-size="48" font-family="Arial" font-weight="700">Hydraulic Hose</text>
+</svg>

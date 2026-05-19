@@ -1,0 +1,7 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#ecfeff"/>
+  <rect x="120" y="240" width="560" height="130" rx="65" fill="#0f766e"/>
+  <rect x="650" y="280" width="90" height="48" rx="10" fill="#115e59"/>
+  <rect x="170" y="275" width="390" height="58" rx="29" fill="#99f6e4"/>
+  <text x="120" y="130" fill="#115e59" font-size="48" font-family="Arial" font-weight="700">Pneumatic Cylinder</text>
+</svg>

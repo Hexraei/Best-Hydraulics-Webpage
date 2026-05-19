@@ -1,0 +1,8 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#dbeafe"/>
+  <rect x="180" y="170" width="440" height="260" rx="24" fill="#1e3a8a"/>
+  <rect x="240" y="220" width="320" height="90" rx="10" fill="#93c5fd"/>
+  <circle cx="300" cy="370" r="40" fill="#60a5fa"/>
+  <circle cx="500" cy="370" r="40" fill="#60a5fa"/>
+  <text x="180" y="120" fill="#1e3a8a" font-size="48" font-family="Arial" font-weight="700">Hydraulic Pump</text>
+</svg>
