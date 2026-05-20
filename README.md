@@ -1,36 +1,127 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Best Hydraulics
 
-## Getting Started
+Best Hydraulics is a mobile-responsive industrial supply website for hydraulics, pneumatics, and industrial rubber components. It is designed for procurement teams, maintenance buyers, OEM users, and workshop operators who need a structured way to browse parts, review technical options, and send quote requests directly to the shop owner.
 
-First, run the development server:
+## What this website is
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This website is a premium B2B catalog and RFQ platform for industrial spare parts. It presents products in a clean, trustworthy, and procurement-oriented layout instead of a typical ecommerce style. The interface is built to feel technical, organized, and reliable across home, catalog, product detail, contact, and cart experiences.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Core goals
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Present industrial products in a professional catalog format
+- Make it easy to search, filter, and compare items
+- Let customers add products to cart and send RFQ requests
+- Route quote requests directly to the shop owner with customer details
+- Keep the experience mobile responsive across all pages
+- Use updated product and background imagery throughout the site
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Main features
 
-## Learn More
+### 1. Industrial homepage
 
-To learn more about Next.js, take a look at the following resources:
+- Large industrial hero section with strong branding
+- Trust-focused messaging
+- Featured product highlights
+- Procurement-style visual hierarchy
+- Direct links to products, contact, and quote actions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. Premium product catalog
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Two-column catalog layout
+- Sticky technical filter rail
+- Search bar for fast product discovery
+- Compact product cards with image, title, category, price, and CTA
+- Results overview shown after searching
 
-## Deploy on Vercel
+### 3. Product detail pages
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Dedicated product pages for each item
+- Clear product visuals
+- Variant and quantity selection
+- Procurement-focused product presentation
+- Easy add-to-cart flow
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 4. Cart and RFQ system
+
+- Cart review page for selected products
+- Customer details form for name, business name, phone number, email ID, and message
+- RFQ request flow that sends enquiry details to the shop owner
+- Cart item summary included in quote requests
+- Supports blank enquiry submissions for callback requests
+
+### 5. Contact page
+
+- Industrial-style contact layout
+- Clickable phone numbers
+- Clickable email address
+- Clickable map/address link
+- Operating hours and support information
+
+### 6. Footer and header
+
+- Professional industrial navigation
+- Contact shortcuts
+- Brand-consistent footer with store details
+- Clear access to products, cart, and contact pages
+
+## Planned product scale
+
+The catalog is designed to grow well beyond the current product set. The site will be updated with 100+ products over time, covering items such as:
+
+- Hydraulic hoses
+- Hydraulic fittings
+- Hydraulic valves
+- Pneumatic valves
+- Pneumatic cylinders
+- Air tubes and fittings
+- Seals and seal kits
+- Rubber sheets
+- Rubber gaskets
+- Industrial machine components
+
+## RFQ workflow
+
+The RFQ flow is built to help customers request pricing without needing a full checkout-first ecommerce flow.
+
+### Expected flow
+
+1. Browse products
+2. Add required items to cart
+3. Open cart and review items
+4. Enter customer details and extra message
+5. Send the RFQ directly to the shop owner
+6. Receive follow-up on pricing, availability, and service support
+
+### Information captured in RFQ
+
+- Customer name
+- Business name (optional)
+- Phone number
+- Email ID
+- Extra message
+- Cart items and quantities
+
+## Mobile responsiveness
+
+The site is built to work smoothly on phones, tablets, and desktops. Layouts reflow for smaller screens, cards stay readable, and the catalog and RFQ experience remain usable on mobile devices.
+
+## Image updates
+
+All key pages are intended to use properly updated industrial images, including:
+
+- Hydraulic equipment
+- Pneumatic components
+- Industrial hardware
+- Warehouse and factory visuals
+- Technical close-up product shots
+
+## Tech stack
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+
+## Summary
+
+Best Hydraulics is a serious industrial supply website built to support procurement, technical buying, and RFQ-driven sales. It focuses on reliability, clarity, and structured product presentation, with room to expand into a large industrial catalog of 100+ products.
