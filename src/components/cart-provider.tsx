@@ -21,6 +21,7 @@ type CartContextValue = {
   isVariantInCart: (variantId: string) => boolean;
   isProductInCart: (productId: string) => boolean;
   subtotal: number;
+  clearCart: () => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -98,9 +99,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     [lines],
   );
 
+  const clearCart = () => {
+    setLines([]);
+  };
+
   return (
     <CartContext.Provider
-      value={{ lines, addToCart, updateQuantity, updateVariant, isVariantInCart, isProductInCart, subtotal }}
+      value={{
+        lines,
+        addToCart,
+        updateQuantity,
+        updateVariant,
+        isVariantInCart,
+        isProductInCart,
+        subtotal,
+        clearCart,
+      }}
     >
       {children}
     </CartContext.Provider>

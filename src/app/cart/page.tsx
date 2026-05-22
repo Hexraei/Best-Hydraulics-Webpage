@@ -16,45 +16,117 @@ function CartItemImage({ productName, image }: { productName: string; image?: st
 }
 
 export default function CartPage() {
-  const { lines, subtotal, updateQuantity, updateVariant } = useCart();
+  const { lines, subtotal, updateQuantity, updateVariant, clearCart } = useCart();
   const [name, setName] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [emailId, setEmailId] = useState("");
   const [message, setMessage] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setErrorMsg("");
+    setSubmitting(true);
 
-    const address = "alfaruberss@gmail.com";
-    const cartSummary =
-      lines.length > 0
-        ? lines
-            .map((line) => {
-              const product = getProductById(line.productId);
-              const variant = product?.variants.find((item) => item.id === line.variantId);
-              return `${line.productName} | ${product?.category ?? "Industrial"} | ${
-                variant?.dimension ?? line.dimension
-              } | Qty: ${line.quantity} | ${formatINR(line.unitPrice * line.quantity)}`;
-            })
-            .join("\n")
-        : "No cart items included.";
+    try {
+      if (lines.length > 0) {
+        const payload = {
+          lines: lines.map((line) => ({
+            productId: line.productId,
+            variantId: line.variantId,
+            quantity: line.quantity,
+          })),
+        };
 
-    const body = [
-      `Name: ${name || "-"}`,
-      `Business Name: ${businessName || "-"}`,
-      `Phone Number: ${phoneNumber || "-"}`,
-      `Email ID: ${emailId || "-"}`,
-      `Extra Message: ${message || "-"}`,
-      "",
-      "Cart Items:",
-      cartSummary,
-      "",
-      `Subtotal: ${formatINR(subtotal)}`,
-    ].join("\n");
+        const response = await fetch("/api/cart/validate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
 
-    window.location.href = `mailto:${address}?subject=${encodeURIComponent("Request Quote - Best Hydraulics")}&body=${encodeURIComponent(body)}`;
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Stock validation failed");
+        }
+      }
+
+      const address = "alfaruberss@gmail.com";
+      const cartSummary =
+        lines.length > 0
+          ? lines
+              .map((line) => {
+                const product = getProductById(line.productId);
+                const variant = product?.variants.find((item) => item.id === line.variantId);
+                return `${line.productName} | ${product?.category ?? "Industrial"} | ${
+                  variant?.dimension ?? line.dimension
+                } | Qty: ${line.quantity} | ${formatINR(line.unitPrice * line.quantity)}`;
+              })
+              .join("\n")
+          : "No cart items included.";
+
+      const body = [
+        `Name: ${name || "-"}`,
+        `Business Name: ${businessName || "-"}`,
+        `Phone Number: ${phoneNumber || "-"}`,
+        `Email ID: ${emailId || "-"}`,
+        `Extra Message: ${message || "-"}`,
+        "",
+        "Cart Items:",
+        cartSummary,
+        "",
+        `Subtotal: ${formatINR(subtotal)}`,
+      ].join("\n");
+
+      window.location.href = `mailto:${address}?subject=${encodeURIComponent("Request Quote - Best Hydraulics")}&body=${encodeURIComponent(body)}`;
+      
+      clearCart();
+      setSuccess(true);
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Something went wrong. Please check stock levels.");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (success) {
+    return (
+      <div className="bg-slate-50/70 py-16">
+        <div className="container max-w-xl text-center">
+          <div className="rounded-[4px] border border-slate-200 bg-white p-8 shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-2xl text-emerald-600">
+              ✓
+            </span>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">Quote Request Initiated</h2>
+            <p className="mt-4 text-sm leading-6 text-slate-600">
+              Your Request for Quote (RFQ) has been compiled! Your email client should have opened with the pre-filled RFQ details.
+            </p>
+            <p className="mt-2 text-sm leading-6 text-slate-600 font-medium">
+              Please click &quot;Send&quot; in your email app to submit the request to our sales desk.
+            </p>
+            <div className="mt-8 flex justify-center gap-4">
+              <Link
+                href="/products"
+                className="inline-flex h-11 items-center justify-center rounded-[3px] border border-slate-950 bg-slate-950 px-5 text-sm font-medium !text-white transition-colors hover:bg-slate-800"
+              >
+                Return to Catalog
+              </Link>
+              <button
+                onClick={() => setSuccess(false)}
+                className="inline-flex h-11 items-center justify-center rounded-[3px] border border-slate-300 bg-white px-5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+              >
+                Send Another Request
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-slate-50/70">
@@ -229,11 +301,18 @@ export default function CartPage() {
                   />
                 </label>
 
+                {errorMsg && (
+                  <div className="rounded-[3px] border border-red-200 bg-red-950 p-3 text-xs font-semibold text-red-200">
+                    ⚠️ {errorMsg}
+                  </div>
+                )}
+
                 <button
                   type="submit"
-                  className="inline-flex h-11 w-full items-center justify-center rounded-[3px] border border-white/15 bg-white px-4 text-sm font-medium text-slate-950 transition-colors hover:bg-slate-100"
+                  disabled={submitting}
+                  className="inline-flex h-11 w-full items-center justify-center rounded-[3px] border border-white/15 bg-white px-4 text-sm font-medium text-slate-950 transition-colors hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Request Quote
+                  {submitting ? "Validating stock..." : "Request Quote"}
                 </button>
               </div>
             </form>

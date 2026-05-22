@@ -1,4 +1,10 @@
 import type { ReactNode } from "react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact Us | Sourcing & RFQ Support - Best Hydraulics",
+  description: "Get in touch with Best Hydraulics for procurement-ready pricing, industrial quotations, and shipping coordination across India.",
+};
 
 function PhoneIcon() {
   return (

@@ -17,6 +17,10 @@ export type Product = {
   image: string;
   gallery: string[];
   variants: ProductVariant[];
+  brand?: string;
+  material?: string;
+  pressureRating?: string;
+  application?: string;
 };
 
 export type CartLineInput = {

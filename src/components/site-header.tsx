@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { useCart } from "@/components/cart-provider";
 
 function WhatsAppIcon() {
   return (
@@ -103,6 +104,8 @@ function ActionIconLink({
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const { lines } = useCart();
+  const cartCount = lines.reduce((sum, line) => sum + line.quantity, 0);
 
   const isHome = pathname === "/";
   const isProducts = pathname.startsWith("/products");
@@ -137,9 +140,14 @@ export function SiteHeader() {
             <ActionIconLink
               href="/cart"
               label="Cart"
-              toneClass="border-white/15 bg-white/5 hover:bg-white/10 hover:border-white/25"
+              toneClass="border-white/15 bg-white/5 hover:bg-white/10 hover:border-white/25 relative"
             >
               <CartIcon />
+              {cartCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[0.7rem] font-bold text-white shadow-sm ring-2 ring-slate-950">
+                  {cartCount}
+                </span>
+              )}
             </ActionIconLink>
           </div>
         </div>

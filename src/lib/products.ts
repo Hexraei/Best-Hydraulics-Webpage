@@ -79,6 +79,11 @@ export const products: Product[] = Array.from({ length: 50 }, (_, index) => {
   const imgC = imagePool[(index + 6) % imagePool.length];
   const variants = createVariants(index);
 
+  const brands = ["Best Hydraulics", "OEM Compatible", "Industrial Grade"];
+  const materials = ["Nitrile", "EPDM", "Polyurethane", "Steel", "Rubber"];
+  const pressures = ["10 bar", "16 bar", "25 bar", "40 bar", "63 bar"];
+  const applications = ["Plant Maintenance", "OEM Assembly", "Machine Shop", "Fabrication", "Automation"];
+
   return {
     id: `prd-${itemNumber.toString().padStart(3, "0")}`,
     slug: slugBase,
@@ -91,6 +96,10 @@ export const products: Product[] = Array.from({ length: 50 }, (_, index) => {
     image: imgA,
     gallery: [imgA, imgB, imgC],
     variants,
+    brand: brands[index % brands.length],
+    material: materials[index % materials.length],
+    pressureRating: pressures[index % pressures.length],
+    application: applications[index % applications.length],
   };
 });
 

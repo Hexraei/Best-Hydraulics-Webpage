@@ -1,9 +1,36 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { AddToCartPanel } from "@/components/add-to-cart-panel";
 import { formatINR } from "@/lib/currency";
 import { getProductBySlug } from "@/lib/products";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
+
+  if (!product) {
+    return {
+      title: "Product Not Found - Best Hydraulics",
+      description: "The requested industrial product was not found in our catalog.",
+    };
+  }
+
+  return {
+    title: `${product.name} | ${product.category} - Best Hydraulics`,
+    description: `Buy ${product.name} (${product.family}). ${product.description} Sourcing spare parts for plant maintenance and OEM procurement.`,
+    openGraph: {
+      title: `${product.name} - Best Hydraulics`,
+      description: product.description,
+      images: [{ url: product.image }],
+    },
+  };
+}
 
 const applicationMap: Record<string, string[]> = {
   Hydraulics: ["Plant maintenance", "Machine tools", "Pressure transfer", "OEM assemblies"],

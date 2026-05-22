@@ -4,63 +4,55 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/types";
 import { formatINR } from "@/lib/currency";
-import { useCart } from "@/components/cart-provider";
 
-function badgeClass(tag: Product["tag"]) {
-  if (tag === "In Stock") return "badge badge-green";
-  return "badge badge-orange";
+export function getCategoryImage(category: string) {
+  if (category === "Hydraulics") return "/images/hydraulic-hose.svg";
+  if (category === "Pneumatics") return "/images/pneumatic-cylinder.svg";
+  return "/images/rubber-sheet.svg";
 }
 
-function dimensionPreview(product: Product) {
-  const unique = Array.from(
-    new Set(
-      product.variants
-        .map((variant) => {
-          const match = variant.dimension.match(/\d+\/\d+|\d+(\.\d+)?/);
-          return match ? match[0] : "";
-        })
-        .filter(Boolean),
-    ),
-  ).slice(0, 3);
-  return unique.length ? `${unique.join(", ")} etc.` : "-";
+interface ProductCardProps {
+  product: Product;
+  useCategoryImage?: boolean;
 }
 
-export function ProductCard({ product }: { product: Product }) {
-  const { addToCart, isProductInCart } = useCart();
-  const isAdded = isProductInCart(product.id);
+export function ProductCard({ product, useCategoryImage = false }: ProductCardProps) {
   const minPrice = Math.min(...product.variants.map((variant) => variant.price));
-  const dimensions = dimensionPreview(product);
-  const stock = product.variants.reduce((sum, variant) => sum + variant.stock, 0);
+  const imageSrc = useCategoryImage ? getCategoryImage(product.category) : product.image;
 
   return (
-    <article className="card p-3 flex flex-col gap-2.5">
-      <div className="relative aspect-[4/2.5] overflow-hidden rounded-lg bg-slate-100">
-        <Image src={product.image} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" />
-        <span className={`${badgeClass(product.tag)} absolute top-2 right-2 whitespace-nowrap shadow-md`}>{product.tag}</span>
-      </div>
-      <div className="flex items-start gap-2 mt-2">
-        <h3 className="font-semibold text-sm text-slate-900 leading-snug">{product.name}</h3>
-      </div>
-      <p className="text-xs text-slate-600">{product.family}</p>
-      <p className="text-xs text-slate-700"><strong>Dimensions:</strong> {dimensions}</p>
-      <p className="text-xs text-slate-700"><strong>Status:</strong> {stock > 0 ? "In Stock" : "Out of Stock"}</p>
-      <p className="text-slate-900 leading-none">
-        <span className="text-xl font-extrabold">{formatINR(minPrice)}</span>{" "}
-        <span className="text-xs text-slate-500 font-medium">onwards</span>
-      </p>
-      <div className="flex gap-2 mt-1">
-        <Link href={`/products/${product.slug}`} className="btn-secondary text-xs">View Details</Link>
-        {isAdded ? (
-          <Link href="/cart" className="btn-primary text-xs">Go to Cart</Link>
-        ) : (
-          <button
-            type="button"
-            className="btn-primary text-xs cursor-pointer"
-            onClick={() => addToCart(product, product.variants[0].id, 1)}
+    <article className="flex flex-col overflow-hidden rounded-[4px] border border-slate-200 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
+      <Link href={`/products/${product.slug}`} className="relative block aspect-[4/3] overflow-hidden bg-slate-100">
+        <Image
+          src={imageSrc}
+          alt={product.name}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+          className="object-cover transition-transform duration-500 ease-out hover:scale-105"
+        />
+      </Link>
+
+      <div className="flex flex-1 flex-col p-4">
+        <div className="space-y-1.5">
+          <h3 className="text-[1.02rem] font-semibold leading-[1.35] text-slate-900">{product.name}</h3>
+          <p className="text-[0.72rem] uppercase tracking-[0.2em] text-slate-500">
+            {product.category} / {product.family}
+          </p>
+        </div>
+
+        <div className="mt-auto flex items-end justify-between gap-4 border-t border-slate-200 pt-4">
+          <div>
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.18em] text-slate-500">From</p>
+            <p className="mt-1 text-xl font-semibold tracking-tight text-slate-900">{formatINR(minPrice)}</p>
+          </div>
+
+          <Link
+            href={`/products/${product.slug}`}
+            className="inline-flex h-10 items-center justify-center rounded-[3px] border border-slate-300 bg-slate-950 px-4 text-sm font-medium !text-white transition-colors hover:bg-slate-800"
           >
-            Add to Cart
-          </button>
-        )}
+            View Product
+          </Link>
+        </div>
       </div>
     </article>
   );

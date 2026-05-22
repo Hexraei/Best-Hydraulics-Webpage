@@ -1,12 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { formatINR } from "@/lib/currency";
+import { ProductCard } from "@/components/product-card";
 import { products } from "@/lib/products";
-import type { Product } from "@/lib/types";
 
 const filterGroups = [
   {
@@ -44,54 +42,17 @@ const filterGroups = [
   },
 ];
 
-function CatalogProductCard({ product }: { product: Product }) {
-  const minPrice = Math.min(...product.variants.map((variant) => variant.price));
-
-  return (
-    <article className="flex min-h-[27rem] flex-col overflow-hidden rounded-[4px] border border-slate-200 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.05)] transition-shadow duration-200 hover:shadow-[0_16px_34px_rgba(15,23,42,0.08)]">
-      <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-          className="object-cover"
-        />
-      </div>
-
-      <div className="flex flex-1 flex-col p-4">
-        <div className="space-y-1.5">
-          <h3 className="text-[1.02rem] font-semibold leading-[1.35] text-slate-900">{product.name}</h3>
-          <p className="text-[0.72rem] uppercase tracking-[0.2em] text-slate-500">
-            {product.category} / {product.family}
-          </p>
-        </div>
-
-        <div className="mt-auto flex items-end justify-between gap-4 border-t border-slate-200 pt-4">
-          <div>
-            <p className="text-[0.68rem] font-medium uppercase tracking-[0.18em] text-slate-500">From</p>
-            <p className="mt-1 text-xl font-semibold tracking-tight text-slate-900">{formatINR(minPrice)}</p>
-          </div>
-
-          <Link
-            href={`/products/${product.slug}`}
-            className="inline-flex h-10 items-center justify-center rounded-[3px] border border-slate-300 bg-slate-950 px-4 text-sm font-medium !text-white transition-colors hover:bg-slate-800"
-          >
-            View Product
-          </Link>
-        </div>
-      </div>
-    </article>
-  );
-}
-
 function FilterGroup({
   title,
   options,
+  selectedValues,
+  onChangeOption,
   open = false,
 }: {
   title: string;
   options: string[];
+  selectedValues: string[];
+  onChangeOption: (option: string, checked: boolean) => void;
   open?: boolean;
 }) {
   return (
@@ -102,18 +63,26 @@ function FilterGroup({
       </summary>
 
       <div className="mt-4 space-y-2">
-        {options.map((option) => (
-          <label
-            key={option}
-            className="flex cursor-pointer items-center justify-between gap-3 rounded-[3px] border border-transparent px-2 py-2 text-sm text-slate-700 transition hover:border-slate-200 hover:bg-slate-50"
-          >
-            <span className="flex items-center gap-3">
-              <input type="checkbox" className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900" />
-              <span>{option}</span>
-            </span>
-            <span className="text-xs text-slate-400">—</span>
-          </label>
-        ))}
+        {options.map((option) => {
+          const isChecked = selectedValues.includes(option);
+          return (
+            <label
+              key={option}
+              className="flex cursor-pointer items-center justify-between gap-3 rounded-[3px] border border-transparent px-2 py-2 text-sm text-slate-700 transition hover:border-slate-200 hover:bg-slate-50"
+            >
+              <span className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={(e) => onChangeOption(option, e.target.checked)}
+                  className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                />
+                <span>{option}</span>
+              </span>
+              <span className="text-xs text-slate-400">—</span>
+            </label>
+          );
+        })}
       </div>
     </details>
   );
@@ -126,25 +95,154 @@ export default function ProductsPage() {
   const searchParams = useSearchParams();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({
+    "Product Category": [],
+    "Brand": [],
+    "Material": [],
+    "Size": [],
+    "Pressure Rating": [],
+    "Industry/Application": [],
+    "Availability": [],
+    "Price Range": [],
+  });
+
   useEffect(() => {
     if (searchParams.get("focus") === "search") {
       searchInputRef.current?.focus();
     }
   }, [searchParams]);
 
-  const filteredProducts = useMemo(() => {
-    const normalizedQuery = submittedQuery.trim().toLowerCase();
+  useEffect(() => {
+    const catParam = searchParams.get("category");
+    if (catParam) {
+      const timer = setTimeout(() => {
+        setSelectedFilters((prev) => {
+          if (prev["Product Category"][0] === catParam) return prev;
+          return {
+            ...prev,
+            "Product Category": [catParam],
+          };
+        });
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
 
-    if (!normalizedQuery) return products;
-
-    return products.filter((product) => {
-      const searchable = [product.name, product.category, product.family, product.description]
-        .join(" ")
-        .toLowerCase();
-
-      return searchable.includes(normalizedQuery);
+  const handleFilterChange = (groupTitle: string, option: string, checked: boolean) => {
+    setSelectedFilters((prev) => {
+      const currentGroup = prev[groupTitle] || [];
+      const updatedGroup = checked
+        ? [...currentGroup, option]
+        : currentGroup.filter((val) => val !== option);
+      return {
+        ...prev,
+        [groupTitle]: updatedGroup,
+      };
     });
-  }, [submittedQuery]);
+  };
+
+  const clearAllFilters = () => {
+    setSelectedFilters({
+      "Product Category": [],
+      "Brand": [],
+      "Material": [],
+      "Size": [],
+      "Pressure Rating": [],
+      "Industry/Application": [],
+      "Availability": [],
+      "Price Range": [],
+    });
+  };
+
+  const activeFiltersCount = Object.values(selectedFilters).reduce((sum, arr) => sum + arr.length, 0);
+
+  const filteredProducts = useMemo(() => {
+    let result = products;
+
+    // 1. Search Query filter
+    const normalizedQuery = submittedQuery.trim().toLowerCase();
+    if (normalizedQuery) {
+      result = result.filter((product) => {
+        const searchable = [product.name, product.category, product.family, product.description]
+          .join(" ")
+          .toLowerCase();
+        return searchable.includes(normalizedQuery);
+      });
+    }
+
+    // 2. Sidebar Filters
+    // Category
+    const selectedCats = selectedFilters["Product Category"];
+    if (selectedCats && selectedCats.length > 0) {
+      result = result.filter((product) => selectedCats.includes(product.category));
+    }
+
+    // Brand
+    const selectedBrands = selectedFilters["Brand"];
+    if (selectedBrands && selectedBrands.length > 0) {
+      result = result.filter((product) => product.brand && selectedBrands.includes(product.brand));
+    }
+
+    // Material
+    const selectedMaterials = selectedFilters["Material"];
+    if (selectedMaterials && selectedMaterials.length > 0) {
+      result = result.filter((product) => product.material && selectedMaterials.includes(product.material));
+    }
+
+    // Size
+    const selectedSizes = selectedFilters["Size"];
+    if (selectedSizes && selectedSizes.length > 0) {
+      result = result.filter((product) => {
+        return product.variants.some((variant) => {
+          return selectedSizes.some((size) => variant.dimension.toLowerCase().includes(size.toLowerCase()));
+        });
+      });
+    }
+
+    // Pressure Rating
+    const selectedPressures = selectedFilters["Pressure Rating"];
+    if (selectedPressures && selectedPressures.length > 0) {
+      result = result.filter((product) => product.pressureRating && selectedPressures.includes(product.pressureRating));
+    }
+
+    // Industry/Application
+    const selectedApps = selectedFilters["Industry/Application"];
+    if (selectedApps && selectedApps.length > 0) {
+      result = result.filter((product) => product.application && selectedApps.includes(product.application));
+    }
+
+    // Availability
+    const selectedAvails = selectedFilters["Availability"];
+    if (selectedAvails && selectedAvails.length > 0) {
+      result = result.filter((product) => {
+        const inStock = product.variants.some((v) => v.stock > 0);
+        return selectedAvails.some((avail) => {
+          if (avail === "In Stock") return inStock;
+          if (avail === "Dispatch Today") return inStock;
+          if (avail === "Made to Order") return !inStock;
+          if (avail === "Bulk Supply") return inStock;
+          return false;
+        });
+      });
+    }
+
+    // Price Range
+    const selectedPrices = selectedFilters["Price Range"];
+    if (selectedPrices && selectedPrices.length > 0) {
+      result = result.filter((product) => {
+        const minPrice = Math.min(...product.variants.map((v) => v.price));
+        return selectedPrices.some((range) => {
+          if (range === "Under ₹1,500") return minPrice < 1500;
+          if (range === "₹1,500 - ₹3,000") return minPrice >= 1500 && minPrice <= 3000;
+          if (range === "₹3,000 - ₹5,000") return minPrice >= 3000 && minPrice <= 5000;
+          if (range === "₹5,000+") return minPrice > 5000;
+          return false;
+        });
+      });
+    }
+
+    return result;
+  }, [submittedQuery, selectedFilters]);
 
   const onSearch = () => {
     setSubmittedQuery(query);
@@ -156,6 +254,8 @@ export default function ProductsPage() {
     setSubmittedQuery("");
     setHasSearched(false);
   };
+
+  const totalResultsCount = filteredProducts.length;
 
   return (
     <div className="bg-slate-50/70">
@@ -220,38 +320,66 @@ export default function ProductsPage() {
         <div className="mt-6 grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
           <aside className="lg:sticky lg:top-[15rem] lg:self-start">
             <div className="rounded-[4px] border border-slate-200 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
-              <div className="border-b border-slate-200 px-4 py-4">
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
-                  Filter catalog
-                </p>
-                <h2 className="mt-1 text-lg font-semibold text-slate-950">Technical filters</h2>
+              <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
+                <div>
+                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
+                    Filter catalog
+                  </p>
+                  <h2 className="mt-1 text-lg font-semibold text-slate-950">Technical filters</h2>
+                </div>
+                {activeFiltersCount > 0 && (
+                  <button
+                    onClick={clearAllFilters}
+                    className="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                )}
               </div>
 
               <div className="divide-y divide-slate-200 px-4">
                 {filterGroups.map((group) => (
-                  <FilterGroup key={group.title} title={group.title} options={group.options} open={group.open} />
+                  <FilterGroup
+                    key={group.title}
+                    title={group.title}
+                    options={group.options}
+                    open={group.open}
+                    selectedValues={selectedFilters[group.title] || []}
+                    onChangeOption={(option, checked) => handleFilterChange(group.title, option, checked)}
+                  />
                 ))}
               </div>
             </div>
           </aside>
 
           <section className="space-y-5">
-            {hasSearched ? (
-              <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-3">
-                <div>
-                  <p className="text-lg font-semibold tracking-tight text-slate-950">Results Overview</p>
-                </div>
-                <p className="text-lg font-semibold text-slate-900">
-                  Available Products: {filteredProducts.length}
+            <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-3">
+              <div>
+                <p className="text-lg font-semibold tracking-tight text-slate-950">
+                  {hasSearched ? "Results Overview" : "Catalog Overview"}
                 </p>
               </div>
-            ) : null}
+              <p className="text-sm font-medium text-slate-500">
+                Available Products: <span className="font-semibold text-slate-900">{totalResultsCount}</span>
+              </p>
+            </div>
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {filteredProducts.map((product) => (
-                <CatalogProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
+            {totalResultsCount === 0 && (
+              <div className="py-12 text-center">
+                <p className="text-lg font-medium text-slate-900">No products match your selected filters.</p>
+                <button
+                  onClick={clearAllFilters}
+                  className="mt-4 inline-flex h-10 items-center justify-center rounded-[3px] border border-slate-950 bg-slate-950 px-4 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+                >
+                  Reset All Filters
+                </button>
+              </div>
+            )}
           </section>
         </div>
       </div>
