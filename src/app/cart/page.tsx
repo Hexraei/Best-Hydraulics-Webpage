@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useCart } from "@/components/cart-provider";
 import { formatINR } from "@/lib/currency";
-import { getProductById } from "@/lib/products";
 
 function CartItemImage({ productName, image }: { productName: string; image?: string }) {
   if (!image) {
@@ -22,6 +21,7 @@ export default function CartPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [emailId, setEmailId] = useState("");
   const [message, setMessage] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -33,61 +33,53 @@ export default function CartPage() {
 
     try {
       if (lines.length > 0) {
-        const payload = {
+        const stockResponse = await fetch("/api/cart/validate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            lines: lines.map((line) => ({
+              productId: line.productId,
+              variantId: line.variantId,
+              quantity: line.quantity,
+            })),
+          }),
+        });
+
+        if (!stockResponse.ok) {
+          const errorData = await stockResponse.json().catch(() => ({}));
+          throw new Error(errorData.message || "Stock validation failed");
+        }
+      }
+
+      const response = await fetch("/api/rfq", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          businessName,
+          phoneNumber,
+          emailId,
+          message,
+          company: honeypot,
           lines: lines.map((line) => ({
             productId: line.productId,
             variantId: line.variantId,
             quantity: line.quantity,
           })),
-        };
+        }),
+      });
 
-        const response = await fetch("/api/cart/validate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Stock validation failed");
-        }
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "We could not submit your request. Please try again.");
       }
 
-      const address = "alfaruberss@gmail.com";
-      const cartSummary =
-        lines.length > 0
-          ? lines
-              .map((line) => {
-                const product = getProductById(line.productId);
-                const variant = product?.variants.find((item) => item.id === line.variantId);
-                return `${line.productName} | ${product?.category ?? "Industrial"} | ${
-                  variant?.dimension ?? line.dimension
-                } | Qty: ${line.quantity} | ${formatINR(line.unitPrice * line.quantity)}`;
-              })
-              .join("\n")
-          : "No cart items included.";
-
-      const body = [
-        `Name: ${name || "-"}`,
-        `Business Name: ${businessName || "-"}`,
-        `Phone Number: ${phoneNumber || "-"}`,
-        `Email ID: ${emailId || "-"}`,
-        `Extra Message: ${message || "-"}`,
-        "",
-        "Cart Items:",
-        cartSummary,
-        "",
-        `Subtotal: ${formatINR(subtotal)}`,
-      ].join("\n");
-
-      window.location.href = `mailto:${address}?subject=${encodeURIComponent("Request Quote - Best Hydraulics")}&body=${encodeURIComponent(body)}`;
-      
       clearCart();
       setSuccess(true);
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Something went wrong. Please check stock levels.");
+      setErrorMsg(
+        err instanceof Error ? err.message : "Something went wrong. Please try again or call us directly.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -101,12 +93,17 @@ export default function CartPage() {
             <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-2xl text-emerald-600">
               ✓
             </span>
-            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">Quote Request Initiated</h2>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">Quote Request Sent</h2>
             <p className="mt-4 text-sm leading-6 text-slate-600">
-              Your Request for Quote (RFQ) has been compiled! Your email client should have opened with the pre-filled RFQ details.
+              Your Request for Quote has been delivered to our sales desk. Our team will get back to you on pricing,
+              availability, and dispatch as soon as possible.
             </p>
-            <p className="mt-2 text-sm leading-6 text-slate-600 font-medium">
-              Please click &quot;Send&quot; in your email app to submit the request to our sales desk.
+            <p className="mt-2 text-sm leading-6 font-medium text-slate-600">
+              Need it urgently? Call us on{" "}
+              <a href="tel:9994703528" className="text-blue-600 hover:text-blue-800">
+                9994703528
+              </a>
+              .
             </p>
             <div className="mt-8 flex justify-center gap-4">
               <Link
@@ -167,9 +164,7 @@ export default function CartPage() {
             ) : (
               <div className="space-y-4">
                 {lines.map((line) => {
-                  const product = getProductById(line.productId);
-                  const variant = product?.variants.find((item) => item.id === line.variantId);
-                  const image = product?.image;
+                  const variant = line.options.find((item) => item.id === line.variantId);
                   const lineTotal = line.unitPrice * line.quantity;
 
                   return (
@@ -179,7 +174,7 @@ export default function CartPage() {
                     >
                       <div className="grid gap-4 md:grid-cols-[120px_minmax(0,1fr)]">
                         <div className="relative aspect-square overflow-hidden rounded-[4px] border border-slate-200 bg-slate-100">
-                          <CartItemImage productName={line.productName} image={image} />
+                          <CartItemImage productName={line.productName} image={line.image} />
                         </div>
 
                         <div className="flex min-w-0 flex-col gap-4">
@@ -187,7 +182,7 @@ export default function CartPage() {
                             <div className="min-w-0">
                               <h3 className="truncate text-lg font-semibold tracking-tight text-slate-950">{line.productName}</h3>
                               <p className="mt-1 text-sm uppercase tracking-[0.18em] text-slate-500">
-                                {product?.category ?? "Industrial"} / {variant?.dimension ?? line.dimension}
+                                {line.category} / {variant?.dimension ?? line.dimension}
                               </p>
                             </div>
                             <p className="text-lg font-semibold tracking-tight text-slate-950">{formatINR(lineTotal)}</p>
@@ -203,7 +198,7 @@ export default function CartPage() {
                                 onChange={(event) => updateVariant(line.variantId, event.target.value)}
                                 className="h-11 w-full rounded-[3px] border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-400"
                               >
-                                {(product?.variants ?? []).map((item) => (
+                                {line.options.map((item) => (
                                   <option key={item.id} value={item.id}>
                                     {item.dimension} • {item.color}
                                   </option>
@@ -301,8 +296,23 @@ export default function CartPage() {
                   />
                 </label>
 
+                {/* Spam trap: hidden from users, ignored by them, filled by bots. */}
+                <input
+                  type="text"
+                  name="company"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  value={honeypot}
+                  onChange={(event) => setHoneypot(event.target.value)}
+                  className="absolute h-0 w-0 overflow-hidden opacity-0"
+                />
+
                 {errorMsg && (
-                  <div className="rounded-[3px] border border-red-200 bg-red-950 p-3 text-xs font-semibold text-red-200">
+                  <div
+                    role="alert"
+                    className="rounded-[3px] border border-red-200 bg-red-950 p-3 text-xs font-semibold text-red-200"
+                  >
                     ⚠️ {errorMsg}
                   </div>
                 )}
@@ -312,7 +322,7 @@ export default function CartPage() {
                   disabled={submitting}
                   className="inline-flex h-11 w-full items-center justify-center rounded-[3px] border border-white/15 bg-white px-4 text-sm font-medium text-slate-950 transition-colors hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {submitting ? "Validating stock..." : "Request Quote"}
+                  {submitting ? "Sending request..." : "Request Quote"}
                 </button>
               </div>
             </form>
