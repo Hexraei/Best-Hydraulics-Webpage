@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useCart } from "@/components/cart-provider";
 
 function WhatsAppIcon() {
@@ -47,6 +47,22 @@ function SearchIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 fill-none stroke-current stroke-[1.6]">
       <circle cx="11" cy="11" r="5.5" />
       <path d="M15.2 15.2 19 19" />
+    </svg>
+  );
+}
+
+function MenuIcon({ open }: { open: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 fill-none stroke-current stroke-[1.7]">
+      {open ? (
+        <path d="M6 6 18 18M18 6 6 18" strokeLinecap="round" />
+      ) : (
+        <>
+          <path d="M4 7h16" strokeLinecap="round" />
+          <path d="M4 12h16" strokeLinecap="round" />
+          <path d="M4 17h16" strokeLinecap="round" />
+        </>
+      )}
     </svg>
   );
 }
@@ -102,14 +118,37 @@ function ActionIconLink({
   );
 }
 
+const navItems = [
+  { href: "/", label: "Home" },
+  { href: "/products", label: "Products" },
+  { href: "/#about", label: "About" },
+  { href: "/contact", label: "Contact Us" },
+  { href: "/cart", label: "Cart" },
+];
+
 export function SiteHeader() {
   const pathname = usePathname();
-  const { lines } = useCart();
-  const cartCount = lines.reduce((sum, line) => sum + line.quantity, 0);
+  const { lines, hydrated } = useCart();
 
-  const isHome = pathname === "/";
-  const isProducts = pathname.startsWith("/products");
-  const isContact = pathname === "/contact";
+  // The menu is stored with the route it was opened on, so a navigation closes
+  // it during render — no effect and no extra render pass.
+  const [menuState, setMenuState] = useState<{ open: boolean; path: string }>({
+    open: false,
+    path: pathname,
+  });
+  const menuOpen = menuState.open && menuState.path === pathname;
+  const setMenuOpen = (open: boolean) => setMenuState({ open, path: pathname });
+
+  // Suppressed until hydration so the server-rendered header (always an empty
+  // cart) does not flash a stale count.
+  const cartCount = hydrated ? lines.reduce((sum, line) => sum + line.quantity, 0) : 0;
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    if (href === "/products") return pathname.startsWith("/products");
+    if (href.startsWith("/#")) return false;
+    return pathname === href;
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950 text-white shadow-[0_1px_0_rgba(255,255,255,0.03)]">
@@ -155,22 +194,54 @@ export function SiteHeader() {
 
       <div>
         <div className="container flex h-[4.5rem] items-center justify-between gap-4 py-1">
-          <nav className="flex min-w-0 flex-wrap items-center gap-2">
-            <NavLink href="/" label="Home" active={isHome} />
-            <NavLink href="/products" label="Products" active={isProducts} />
-            <NavLink href="/#about" label="About" active={false} />
-            <NavLink href="/contact" label="Contact Us" active={isContact} />
-            <NavLink href="/cart" label="Cart" active={pathname === "/cart"} />
+          <button
+            type="button"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] border border-white/10 bg-white/5 text-slate-100 transition-colors hover:bg-white/10 md:hidden"
+          >
+            <MenuIcon open={menuOpen} />
+          </button>
+
+          <nav aria-label="Main" className="hidden min-w-0 flex-wrap items-center gap-2 md:flex">
+            {navItems.map((item) => (
+              <NavLink key={item.href} href={item.href} label={item.label} active={isActive(item.href)} />
+            ))}
           </nav>
 
           <Link
             href="/products?focus=search"
             aria-label="Search catalog"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] border border-white/10 bg-white/5 text-slate-100"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-[4px] border border-white/10 bg-white/5 text-slate-100 transition-colors hover:bg-white/10"
           >
             <SearchIcon />
           </Link>
         </div>
+
+        {menuOpen && (
+          <nav
+            id="mobile-nav"
+            aria-label="Main"
+            className="border-t border-slate-800/70 bg-slate-950 md:hidden"
+          >
+            <div className="container flex flex-col py-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={isActive(item.href) ? "page" : undefined}
+                  className={`flex h-12 items-center border-b border-slate-800/50 text-sm font-medium transition-colors last:border-b-0 ${
+                    isActive(item.href) ? "text-white" : "text-slate-100/80 hover:text-white"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
+        )}
       </div>
     </header>
   );
