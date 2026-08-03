@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { AddToCartPanel } from "@/components/add-to-cart-panel";
 import { formatINR } from "@/lib/currency";
-import { getProductBySlug } from "@/lib/products";
+import { getCatalogProductBySlug } from "@/lib/catalog";
 
 export async function generateMetadata({
   params,
@@ -12,7 +12,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getCatalogProductBySlug(slug);
 
   if (!product) {
     return {
@@ -44,7 +44,7 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getCatalogProductBySlug(slug);
 
   if (!product) notFound();
 
