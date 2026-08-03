@@ -87,3 +87,26 @@ a {
 .review-float {
   animation: float 5s ease-in-out infinite;
 }
+
+@keyframes splash-out {
+  0%, 60% { opacity: 1; }
+  100%    { opacity: 0; }
+}
+
+.splash-overlay {
+  animation: splash-out 350ms ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .review-float,
+  .loader-bar {
+    animation: none;
+  }
+
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

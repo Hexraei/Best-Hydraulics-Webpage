@@ -3,7 +3,7 @@ import Link from "next/link";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import { IndustrialHeroSlideshow } from "@/components/industrial-hero-slideshow";
 import { ProductCard } from "@/components/product-card";
-import { products } from "@/lib/products";
+import { getCatalog } from "@/lib/catalog";
 
 const categoryTiles = [
   {
@@ -30,8 +30,8 @@ const trustIndicators = [
   "Fast Dispatch Across India",
 ];
 
-export default function Home() {
-  const featured = products.slice(0, 4);
+export default async function Home() {
+  const featured = (await getCatalog()).slice(0, 4);
 
   return (
     <div className="bg-slate-50/70">
@@ -216,7 +216,7 @@ export default function Home() {
               <h2 className="text-4xl font-semibold tracking-tight text-slate-950">Our Mission</h2>
               <div className="space-y-4 text-[0.96rem] leading-7 text-slate-600">
                 <p>
-                  At Best Pneumatics, our mission is to be the most dependable industrial components partner for maintenance engineers, OEM procurement teams, and plant operations managers across India. We believe that the right part, arriving at the right time, is the difference between a plant running at capacity and one standing still.
+                  At Best Hydraulics, our mission is to be the most dependable industrial components partner for maintenance engineers, OEM procurement teams, and plant operations managers across India. We believe that the right part, arriving at the right time, is the difference between a plant running at capacity and one standing still.
                 </p>
                 <p>
                   We source every product through a verified supply chain — from hydraulic hoses and pressure fittings to pneumatic cylinders and industrial rubber seals — holding each to strict dimensional and material standards before it reaches your facility. Our team is built around engineers, not just salespeople, which means our guidance is grounded in real application knowledge.
