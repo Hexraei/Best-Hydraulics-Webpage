@@ -44,22 +44,28 @@ function createVariants(productIndex: number) {
   return [
     {
       id: `var-${productIndex + 1}-a`,
-      dimension: "Small / 1/4 in",
-      specs: [{ name: "Color", value: "Black" }],
+      specs: [
+        { name: "Size", value: "Small / 1/4 in" },
+        { name: "Color", value: "Black" },
+      ],
       price: base,
       stock: 20 + (productIndex % 14),
     },
     {
       id: `var-${productIndex + 1}-b`,
-      dimension: "Medium / 3/8 in",
-      specs: [{ name: "Color", value: "Blue" }],
+      specs: [
+        { name: "Size", value: "Medium / 3/8 in" },
+        { name: "Color", value: "Blue" },
+      ],
       price: base + 240,
       stock: 14 + (productIndex % 10),
     },
     {
       id: `var-${productIndex + 1}-c`,
-      dimension: "Large / 1/2 in",
-      specs: [{ name: "Color", value: "Red" }],
+      specs: [
+        { name: "Size", value: "Large / 1/2 in" },
+        { name: "Color", value: "Red" },
+      ],
       price: base + 520,
       stock: 9 + (productIndex % 7),
     },

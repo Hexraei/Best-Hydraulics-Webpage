@@ -58,7 +58,6 @@ async function main() {
     await db.insert(variantsTable).values(
       product.variants.map((variant, variantIndex) => ({
         productId: row.id,
-        dimension: variant.dimension,
         specs: variant.specs,
         price: variant.price,
         stock: variant.stock,

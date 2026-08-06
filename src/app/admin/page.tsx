@@ -38,7 +38,6 @@ async function loadProducts(): Promise<AdminProduct[]> {
         .filter((variant) => variant.productId === row.id)
         .map((variant) => ({
           id: variant.id,
-          dimension: variant.dimension,
           specs: variant.specs,
           sku: variant.sku,
           price: variant.price,

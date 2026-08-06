@@ -324,7 +324,8 @@ export function AdminDashboard({
                             <span>
                               {line.productName}{" "}
                               <span className="text-slate-500">
-                                ({line.dimension}) × {line.quantity}
+                                {line.specs || line.dimension ? `(${line.specs || line.dimension}) ` : ""}×{" "}
+                                {line.quantity}
                               </span>
                             </span>
                             <span className="font-semibold">{formatINR(line.lineTotal)}</span>

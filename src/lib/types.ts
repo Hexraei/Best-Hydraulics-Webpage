@@ -2,7 +2,6 @@ export type VariantSpec = { name: string; value: string };
 
 export type ProductVariant = {
   id: string;
-  dimension: string;
   specs: VariantSpec[];
   price: number;
   stock: number;
@@ -23,6 +22,8 @@ export type Product = {
   material?: string;
   pressureRating?: string;
   application?: string;
+  partNumber?: string;
+  hsnCode?: string;
 };
 
 export type CartLineInput = {

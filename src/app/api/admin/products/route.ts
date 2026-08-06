@@ -9,7 +9,6 @@ export const dynamic = "force-dynamic";
 
 type VariantInput = {
   id?: number;
-  dimension?: unknown;
   specs?: unknown;
   sku?: unknown;
   price?: unknown;
@@ -111,18 +110,20 @@ export async function POST(request: Request) {
   for (const [index, variant] of rawVariants.entries()) {
     const price = int(variant.price);
     const stock = int(variant.stock);
-    const dimension = str(variant.dimension, 120);
+    const specs = cleanSpecs(variant.specs);
 
-    if (!dimension) {
-      return NextResponse.json({ message: `Variant ${index + 1}: size is required` }, { status: 400 });
+    if (specs.length === 0) {
+      return NextResponse.json(
+        { message: `Variant ${index + 1}: at least one field is required` },
+        { status: 400 },
+      );
     }
     if (!Number.isFinite(price) || price < 0) {
       return NextResponse.json({ message: `Variant ${index + 1}: invalid price` }, { status: 400 });
     }
 
     cleanVariants.push({
-      dimension,
-      specs: cleanSpecs(variant.specs),
+      specs,
       sku: str(variant.sku, 120) || null,
       price,
       stock: Number.isFinite(stock) && stock >= 0 ? stock : 0,

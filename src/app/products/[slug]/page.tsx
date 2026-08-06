@@ -6,6 +6,7 @@ import { AddToCartPanel } from "@/components/add-to-cart-panel";
 import { BrandBadge } from "@/components/brand-badge";
 import { formatINR } from "@/lib/currency";
 import { getCatalogProductBySlug } from "@/lib/catalog";
+import { orderedSpecNames } from "@/lib/specs";
 
 // Same reasoning as the products list: cache and refresh in the background
 // instead of hitting the database on every page view.
@@ -55,9 +56,8 @@ export default async function ProductDetailPage({
 
   const basePrice = Math.min(...product.variants.map((variant) => variant.price));
   const applications = applicationMap[product.category] ?? [];
-  const specColumns = Array.from(
-    new Set(product.variants.flatMap((variant) => variant.specs.map((spec) => spec.name))),
-  );
+  // Model, then codes, then description, then dimensions — see orderedSpecNames.
+  const specColumns = orderedSpecNames(product.variants);
 
   return (
     <div className="bg-slate-50/70">
@@ -171,7 +171,6 @@ export default async function ProductDetailPage({
                 <table className="w-full border-collapse text-sm">
                   <thead className="bg-slate-50 text-left text-[0.72rem] uppercase tracking-[0.2em] text-slate-500">
                     <tr>
-                      <th className="px-4 py-3">Dimension</th>
                       {specColumns.map((column) => (
                         <th key={column} className="px-4 py-3">
                           {column}
@@ -183,7 +182,6 @@ export default async function ProductDetailPage({
                   <tbody className="divide-y divide-slate-200">
                     {product.variants.map((variant) => (
                       <tr key={variant.id} className="bg-white">
-                        <td className="px-4 py-3 font-medium text-slate-900">{variant.dimension}</td>
                         {specColumns.map((column) => (
                           <td key={column} className="px-4 py-3 text-slate-600">
                             {variant.specs.find((spec) => spec.name === column)?.value ?? ""}

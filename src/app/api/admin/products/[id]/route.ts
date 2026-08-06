@@ -104,21 +104,20 @@ export async function PATCH(
     const clean = [];
 
     for (const [index, variant] of incoming.entries()) {
-      const dimension = str(variant.dimension, 120);
       const price = int(variant.price);
       const stock = int(variant.stock);
+      const specs = cleanSpecs(variant.specs);
 
-      if (!dimension || !Number.isFinite(price) || price < 0) {
+      if (specs.length === 0 || !Number.isFinite(price) || price < 0) {
         return NextResponse.json(
-          { message: `Variant ${index + 1}: size and a valid price are required` },
+          { message: `Variant ${index + 1}: at least one field and a valid price are required` },
           { status: 400 },
         );
       }
 
       clean.push({
         productId,
-        dimension,
-        specs: cleanSpecs(variant.specs),
+        specs,
         sku: str(variant.sku, 120) || null,
         price,
         stock: Number.isFinite(stock) && stock >= 0 ? stock : 0,

@@ -62,7 +62,6 @@ export const variants = pgTable(
     productId: integer("product_id")
       .notNull()
       .references(() => products.id, { onDelete: "cascade" }),
-    dimension: varchar("dimension", { length: 120 }).notNull(),
     sku: varchar("sku", { length: 120 }),
     price: integer("price").notNull(),
     stock: integer("stock").notNull().default(0),
@@ -96,7 +95,8 @@ export const quoteRequests = pgTable(
         {
           productName: string;
           category: string;
-          dimension: string;
+          /** Only present on quotes archived before variants moved to freeform specs. */
+          dimension?: string;
           specs: string;
           quantity: number;
           unitPrice: number;

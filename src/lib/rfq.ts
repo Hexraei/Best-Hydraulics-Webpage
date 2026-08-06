@@ -18,7 +18,6 @@ export type RfqPayload = RfqCustomer & {
 export type ResolvedRfqLine = {
   productName: string;
   category: string;
-  dimension: string;
   specs: string;
   quantity: number;
   unitPrice: number;
@@ -116,7 +115,6 @@ export async function resolveRfq(
     lines.push({
       productName: product.name,
       category: product.category,
-      dimension: variant.dimension,
       specs: specsLabel(variant.specs),
       quantity,
       unitPrice: variant.price,
@@ -156,7 +154,7 @@ export function renderRfqText(rfq: ResolvedRfq) {
           .map(
             (line, index) =>
               `${index + 1}. ${line.productName}\n` +
-              `   ${line.category} | ${line.dimension}${line.specs ? ` | ${line.specs}` : ""}\n` +
+              `   ${line.category}${line.specs ? ` | ${line.specs}` : ""}\n` +
               `   Qty: ${line.quantity} x ${formatINR(line.unitPrice)} = ${formatINR(line.lineTotal)}`,
           )
           .join("\n")
@@ -191,7 +189,7 @@ export function renderRfqHtml(rfq: ResolvedRfq) {
               <tr>
                 <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;">
                   <strong style="color:#0f172a;">${escapeHtml(line.productName)}</strong><br>
-                  <span style="color:#64748b;font-size:13px;">${escapeHtml(line.category)} / ${escapeHtml(line.dimension)}${line.specs ? ` / ${escapeHtml(line.specs)}` : ""}</span>
+                  <span style="color:#64748b;font-size:13px;">${escapeHtml(line.category)}${line.specs ? ` / ${escapeHtml(line.specs)}` : ""}</span>
                 </td>
                 <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;text-align:center;color:#0f172a;">${line.quantity}</td>
                 <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;text-align:right;color:#0f172a;">${escapeHtml(formatINR(line.unitPrice))}</td>
@@ -261,7 +259,7 @@ export function renderRfqWhatsApp(rfq: ResolvedRfq) {
   const items =
     lines.length > 0
       ? lines
-          .map((line) => `• ${line.productName} (${line.dimension}) x${line.quantity} = ${formatINR(line.lineTotal)}`)
+          .map((line) => `• ${line.productName}${line.specs ? ` (${line.specs})` : ""} x${line.quantity} = ${formatINR(line.lineTotal)}`)
           .join("\n")
       : "• No cart items (callback request)";
 

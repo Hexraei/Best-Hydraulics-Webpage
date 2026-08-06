@@ -8,8 +8,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { Product, ProductVariant } from "@/lib/types";
-import { specsLabel } from "@/lib/specs";
+import { Product, ProductVariant, VariantSpec } from "@/lib/types";
 
 /**
  * Cart lines are self-contained: they carry the image, category, and the full
@@ -23,20 +22,21 @@ type CartLine = {
   category: string;
   image: string;
   variantId: string;
-  dimension: string;
+  specs: VariantSpec[];
   quantity: number;
   unitPrice: number;
   options: ProductVariant[];
 };
 
-const STORAGE_KEY = "best-hydraulics-cart-v1";
+// v2: variants dropped the dedicated `dimension` field in favour of freeform
+// specs, so v1 carts in localStorage are no longer a valid shape.
+const STORAGE_KEY = "best-hydraulics-cart-v2";
 
 function isVariantOption(value: unknown): value is ProductVariant {
   if (!value || typeof value !== "object") return false;
   const option = value as Record<string, unknown>;
   return (
     typeof option.id === "string" &&
-    typeof option.dimension === "string" &&
     typeof option.price === "number" &&
     typeof option.stock === "number" &&
     Array.isArray(option.specs)
@@ -50,7 +50,7 @@ function isCartLine(value: unknown): value is CartLine {
     typeof line.productId === "string" &&
     typeof line.productName === "string" &&
     typeof line.variantId === "string" &&
-    typeof line.dimension === "string" &&
+    Array.isArray(line.specs) &&
     typeof line.quantity === "number" &&
     typeof line.unitPrice === "number" &&
     Array.isArray(line.options) &&
@@ -135,7 +135,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           category: product.category,
           image: product.image,
           variantId,
-          dimension: variant.dimension,
+          specs: variant.specs,
           quantity,
           unitPrice: variant.price,
           options: product.variants,
@@ -173,9 +173,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         {
           ...source,
           variantId: newVariant.id,
-          dimension: newVariant.specs.length
-            ? `${newVariant.dimension} • ${specsLabel(newVariant.specs)}`
-            : newVariant.dimension,
+          specs: newVariant.specs,
           unitPrice: newVariant.price,
         },
       ];

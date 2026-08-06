@@ -12,7 +12,6 @@ const FALLBACK_IMAGE = "/images/hero-catalog.jpg";
 function toProduct(row: ProductRow, rows: VariantRow[]): Product {
   const variants = rows.map((variant) => ({
     id: String(variant.id),
-    dimension: variant.dimension,
     specs: variant.specs,
     price: variant.price,
     stock: variant.stock,
@@ -36,6 +35,8 @@ function toProduct(row: ProductRow, rows: VariantRow[]): Product {
     material: row.material ?? undefined,
     pressureRating: row.pressureRating ?? undefined,
     application: row.application ?? undefined,
+    partNumber: row.partNumber ?? undefined,
+    hsnCode: row.hsnCode ?? undefined,
   };
 }
 

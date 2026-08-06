@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useCart } from "@/components/cart-provider";
 import { formatINR } from "@/lib/currency";
-import { specsLabel } from "@/lib/specs";
+import { orderedSpecs, variantLabel } from "@/lib/specs";
 
 function CartItemImage({ productName, image }: { productName: string; image?: string }) {
   if (!image) {
@@ -182,9 +182,15 @@ export default function CartPage() {
                           <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
                             <div className="min-w-0">
                               <h3 className="truncate text-lg font-semibold tracking-tight text-slate-950">{line.productName}</h3>
-                              <p className="mt-1 text-sm uppercase tracking-[0.18em] text-slate-500">
-                                {line.category} / {variant?.dimension ?? line.dimension}
-                              </p>
+                              <p className="mt-1 text-sm uppercase tracking-[0.18em] text-slate-500">{line.category}</p>
+                              <dl className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm">
+                                {orderedSpecs(variant?.specs ?? line.specs ?? []).map((spec) => (
+                                  <div key={spec.name} className="flex gap-1.5">
+                                    <dt className="text-slate-500">{spec.name}:</dt>
+                                    <dd className="font-medium text-slate-900">{spec.value}</dd>
+                                  </div>
+                                ))}
+                              </dl>
                             </div>
                             <p className="text-lg font-semibold tracking-tight text-slate-950">{formatINR(lineTotal)}</p>
                           </div>
@@ -201,7 +207,7 @@ export default function CartPage() {
                               >
                                 {line.options.map((item) => (
                                   <option key={item.id} value={item.id}>
-                                    {item.specs?.length ? `${item.dimension} • ${specsLabel(item.specs)}` : item.dimension}
+                                    {variantLabel(item.specs ?? [])}
                                   </option>
                                 ))}
                               </select>

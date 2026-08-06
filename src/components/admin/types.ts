@@ -2,7 +2,6 @@ export type AdminVariantSpec = { name: string; value: string };
 
 export type AdminVariant = {
   id?: number;
-  dimension: string;
   specs: AdminVariantSpec[];
   sku: string | null;
   price: number;
@@ -38,7 +37,8 @@ export type AdminQuote = {
   lines: {
     productName: string;
     category: string;
-    dimension: string;
+    /** Only present on quotes archived before variants moved to freeform specs. */
+    dimension?: string;
     specs: string;
     quantity: number;
     unitPrice: number;
@@ -69,6 +69,6 @@ export function emptyProduct(): AdminProduct {
     image: null,
     gallery: [],
     published: true,
-    variants: [{ dimension: "", specs: [], sku: null, price: 0, stock: 0 }],
+    variants: [{ specs: [{ name: "Size", value: "" }], sku: null, price: 0, stock: 0 }],
   };
 }

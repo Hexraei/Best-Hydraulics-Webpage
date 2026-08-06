@@ -61,7 +61,10 @@ export function ProductForm({
   const addVariant = () =>
     setForm((prev) => ({
       ...prev,
-      variants: [...prev.variants, { dimension: "", specs: [], sku: null, price: 0, stock: 0 }],
+      variants: [
+        ...prev.variants,
+        { specs: [{ name: "Size", value: "" }], sku: null, price: 0, stock: 0 },
+      ],
     }));
 
   const removeVariant = (index: number) =>
@@ -84,6 +87,7 @@ export function ProductForm({
       specs: form.variants[variantIndex].specs.filter((_, i) => i !== specIndex),
     });
 
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
@@ -93,16 +97,17 @@ export function ProductForm({
       return;
     }
     if (form.variants.length === 0) {
-      setError("Please add at least one size and price.");
+      setError("Please add at least one variant with a price.");
       return;
     }
     for (const [index, variant] of form.variants.entries()) {
-      if (!variant.dimension.trim()) {
-        setError(`Size ${index + 1}: please enter a size (for example, 1/2 inch).`);
+      const namedSpecs = variant.specs.filter((spec) => spec.name.trim() && spec.value.trim());
+      if (namedSpecs.length === 0) {
+        setError(`Variant ${index + 1}: please add at least one field (for example, Size: 1/2 inch).`);
         return;
       }
       if (!variant.price || variant.price < 1) {
-        setError(`Size ${index + 1}: please enter a price.`);
+        setError(`Variant ${index + 1}: please enter a price.`);
         return;
       }
     }
@@ -192,14 +197,14 @@ export function ProductForm({
 
         <Step
           number={4}
-          title="Sizes and prices"
-          hint="Add one row for each size you sell. Price in rupees."
+          title="Variants and prices"
+          hint="Add one row for each variant you sell. Fields below become the table columns, in the order you add them. Price in rupees."
         >
           <div className="space-y-4">
             {form.variants.map((variant, index) => (
               <div key={index} className="rounded-md border-2 border-slate-200 bg-slate-50 p-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-base font-bold text-slate-700">Size {index + 1}</p>
+                  <p className="text-base font-bold text-slate-700">Variant {index + 1}</p>
                   {form.variants.length > 1 && (
                     <button
                       type="button"
@@ -211,17 +216,7 @@ export function ProductForm({
                   )}
                 </div>
 
-                <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                  <label className="block">
-                    <span className="text-sm font-semibold text-slate-700">Size</span>
-                    <input
-                      value={variant.dimension}
-                      onChange={(event) => setVariant(index, { dimension: event.target.value })}
-                      className={`mt-1 ${inputClass}`}
-                      placeholder="1/2 inch"
-                    />
-                  </label>
-
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   <label className="block">
                     <span className="text-sm font-semibold text-slate-700">Price (₹)</span>
                     <input
@@ -251,7 +246,10 @@ export function ProductForm({
 
                 <div className="mt-4 border-t border-slate-200 pt-3">
                   <p className="text-sm font-semibold text-slate-700">
-                    Other details <span className="font-normal text-slate-500">(optional — Range, Model No., Color, etc.)</span>
+                    Details{" "}
+                    <span className="font-normal text-slate-500">
+                      (Size, Model, Range, etc. — columns are ordered automatically on the product page)
+                    </span>
                   </p>
                   <div className="mt-2 space-y-2">
                     {variant.specs.map((spec, specIndex) => (
@@ -294,7 +292,7 @@ export function ProductForm({
               onClick={addVariant}
               className="h-14 w-full rounded-md border-2 border-dashed border-slate-400 bg-white text-base font-semibold text-slate-700 hover:bg-slate-50"
             >
-              + Add another size
+              + Add another variant
             </button>
           </div>
         </Step>

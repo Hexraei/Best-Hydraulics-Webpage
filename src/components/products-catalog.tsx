@@ -162,14 +162,32 @@ export function ProductsCatalog({ products }: { products: Product[] }) {
   const filteredProducts = useMemo(() => {
     let result = products;
 
-    // 1. Search Query filter
+    // 1. Search Query filter. Buyers search by model or part number as often as
+    // by name, and those live on the variants, so match against every spec too.
     const normalizedQuery = submittedQuery.trim().toLowerCase();
     if (normalizedQuery) {
+      const terms = normalizedQuery.split(/\s+/);
+
       result = result.filter((product) => {
-        const searchable = [product.name, product.category, product.family, product.description]
+        const haystack = [
+          product.name,
+          product.category,
+          product.family,
+          product.description,
+          product.brand,
+          product.material,
+          product.partNumber,
+          product.hsnCode,
+          ...product.variants.flatMap((variant) =>
+            variant.specs.flatMap((spec) => [spec.name, spec.value]),
+          ),
+        ]
+          .filter(Boolean)
           .join(" ")
           .toLowerCase();
-        return searchable.includes(normalizedQuery);
+
+        // Every term must appear, so extra words narrow rather than widen.
+        return terms.every((term) => haystack.includes(term));
       });
     }
 
@@ -195,9 +213,11 @@ export function ProductsCatalog({ products }: { products: Product[] }) {
     // Size
     const selectedSizes = selectedFilters["Size"];
     if (selectedSizes && selectedSizes.length > 0) {
+      // Size lives in the freeform specs now, so match against every spec value.
       result = result.filter((product) => {
         return product.variants.some((variant) => {
-          return selectedSizes.some((size) => variant.dimension.toLowerCase().includes(size.toLowerCase()));
+          const haystack = variant.specs.map((spec) => spec.value).join(" ").toLowerCase();
+          return selectedSizes.some((size) => haystack.includes(size.toLowerCase()));
         });
       });
     }
