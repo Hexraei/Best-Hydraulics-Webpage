@@ -3,8 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { AddToCartPanel } from "@/components/add-to-cart-panel";
+import { BrandBadge } from "@/components/brand-badge";
 import { formatINR } from "@/lib/currency";
 import { getCatalogProductBySlug } from "@/lib/catalog";
+
+// Same reasoning as the products list: cache and refresh in the background
+// instead of hitting the database on every page view.
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,
@@ -49,7 +54,10 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const basePrice = Math.min(...product.variants.map((variant) => variant.price));
-  const applications = applicationMap[product.category];
+  const applications = applicationMap[product.category] ?? [];
+  const specColumns = Array.from(
+    new Set(product.variants.flatMap((variant) => variant.specs.map((spec) => spec.name))),
+  );
 
   return (
     <div className="bg-slate-50/70">
@@ -85,19 +93,20 @@ export default async function ProductDetailPage({
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_360px]">
           <section className="space-y-6">
-            <article className="overflow-hidden rounded-[4px] border border-slate-200 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
+            <article className="relative overflow-hidden rounded-[4px] border border-slate-200 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
               <div className="grid gap-0 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,0.9fr)]">
-                <div className="relative aspect-[4/3] bg-slate-100">
-                  <Image src={product.image} alt={product.name} fill className="object-cover" />
+                <div className="relative aspect-[4/3] bg-white p-8">
+                  <Image src={product.image} alt={product.name} fill className="object-contain p-4" />
                 </div>
                 <div className="grid gap-3 p-4 sm:grid-cols-3 lg:grid-cols-1">
                   {product.gallery.map((img) => (
-                    <div key={img} className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                      <Image src={img} alt={`${product.name} gallery`} fill className="object-cover" />
+                    <div key={img} className="relative aspect-[4/3] overflow-hidden bg-white p-4">
+                      <Image src={img} alt={`${product.name} gallery`} fill className="object-contain p-2" />
                     </div>
                   ))}
                 </div>
               </div>
+              <BrandBadge brand={product.brand} size="lg" position="bottom" />
             </article>
 
             <article className="rounded-[4px] border border-slate-200 bg-white p-5 shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
@@ -152,7 +161,7 @@ export default async function ProductDetailPage({
                     Variant schedule
                   </p>
                   <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
-                    Size, stock, and pricing
+                    Size and pricing
                   </h2>
                 </div>
                 <p className="text-sm text-slate-600">Starting from {formatINR(basePrice)}</p>
@@ -163,8 +172,11 @@ export default async function ProductDetailPage({
                   <thead className="bg-slate-50 text-left text-[0.72rem] uppercase tracking-[0.2em] text-slate-500">
                     <tr>
                       <th className="px-4 py-3">Dimension</th>
-                      <th className="px-4 py-3">Color</th>
-                      <th className="px-4 py-3">Stock</th>
+                      {specColumns.map((column) => (
+                        <th key={column} className="px-4 py-3">
+                          {column}
+                        </th>
+                      ))}
                       <th className="px-4 py-3">Price</th>
                     </tr>
                   </thead>
@@ -172,8 +184,11 @@ export default async function ProductDetailPage({
                     {product.variants.map((variant) => (
                       <tr key={variant.id} className="bg-white">
                         <td className="px-4 py-3 font-medium text-slate-900">{variant.dimension}</td>
-                        <td className="px-4 py-3 text-slate-600">{variant.color}</td>
-                        <td className="px-4 py-3 text-slate-600">{variant.stock} units</td>
+                        {specColumns.map((column) => (
+                          <td key={column} className="px-4 py-3 text-slate-600">
+                            {variant.specs.find((spec) => spec.name === column)?.value ?? ""}
+                          </td>
+                        ))}
                         <td className="px-4 py-3 font-medium text-slate-900">{formatINR(variant.price)}</td>
                       </tr>
                     ))}

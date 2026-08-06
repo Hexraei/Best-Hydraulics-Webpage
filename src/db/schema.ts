@@ -63,11 +63,14 @@ export const variants = pgTable(
       .notNull()
       .references(() => products.id, { onDelete: "cascade" }),
     dimension: varchar("dimension", { length: 120 }).notNull(),
-    color: varchar("color", { length: 60 }).notNull().default(""),
     sku: varchar("sku", { length: 120 }),
     price: integer("price").notNull(),
     stock: integer("stock").notNull().default(0),
     sortOrder: integer("sort_order").notNull().default(0),
+
+    // Open-ended attributes that vary by product type (Range, Model No., Color,
+    // Differential, ...) instead of forcing every product into fixed columns.
+    specs: jsonb("specs").$type<{ name: string; value: string }[]>().notNull().default([]),
   },
   (table) => [index("variants_product_idx").on(table.productId)],
 );
@@ -94,7 +97,7 @@ export const quoteRequests = pgTable(
           productName: string;
           category: string;
           dimension: string;
-          color: string;
+          specs: string;
           quantity: number;
           unitPrice: number;
           lineTotal: number;

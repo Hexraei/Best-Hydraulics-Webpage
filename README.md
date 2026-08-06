@@ -1,4 +1,4 @@
-# Best Hydraulics
+individual# Best Hydraulics
 
 Best Hydraulics is a mobile-responsive industrial supply website for hydraulics, pneumatics, and industrial rubber components. It is designed for procurement teams, maintenance buyers, OEM users, and workshop operators who need a structured way to browse parts, review technical options, and send quote requests directly to the shop owner.
 

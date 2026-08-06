@@ -3,6 +3,7 @@ import Link from "next/link";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import { IndustrialHeroSlideshow } from "@/components/industrial-hero-slideshow";
 import { ProductCard } from "@/components/product-card";
+import { HeroQuoteForm } from "@/components/hero-quote-form";
 import { getCatalog } from "@/lib/catalog";
 
 const categoryTiles = [
@@ -27,7 +28,6 @@ const trustIndicators = [
   "ISO Certified Supplier",
   "5000+ Industrial Components",
   "Technical Support Available",
-  "Fast Dispatch Across India",
 ];
 
 export default async function Home() {
@@ -43,41 +43,45 @@ export default async function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_42%)]" />
 
         <div className="relative container z-10 flex min-h-[calc(100vh-4rem)] items-center py-16 lg:py-20">
-          <div className="w-full max-w-3xl">
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.26em] text-slate-200/82">
-              Proving Trust since 2006
-            </p>
-            <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Reliable industrial components for hydraulics, pneumatics, and plant operations.
-            </h1>
-            <p className="mt-5 max-w-2xl text-sm leading-6 text-slate-200 sm:text-[0.98rem]">
-              Verified industrial inventory, technical support, and fast dispatch for maintenance teams, OEM buyers,
-              and procurement operations across India.
-            </p>
+          <div className="grid w-full items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]">
+            <div>
+              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.26em] text-slate-200/82">
+                Proving Trust since 2006
+              </p>
+              <h1 className="mt-4 text-5xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
+                Best Hydraulics
+              </h1>
+              <p className="mt-5 max-w-xl text-sm leading-6 text-slate-200 sm:text-[0.98rem]">
+                We supply hydraulic, pneumatic, and industrial rubber components to maintenance teams and OEM
+                buyers across India. Tell us the part you need, and we will source it, price it, and deliver it.
+              </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/products"
-                className="inline-flex h-12 items-center justify-center rounded-[3px] border border-white/15 bg-white px-5 text-sm font-medium text-slate-950 transition-colors hover:bg-slate-100"
-              >
-                Browse Products
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex h-12 items-center justify-center rounded-[3px] border border-white/15 !bg-black px-5 text-sm font-medium !text-white transition-colors hover:bg-slate-900"
-              >
-                Request Quote
-              </Link>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  href="/products"
+                  className="inline-flex h-12 items-center justify-center rounded-[3px] border border-white/15 bg-white px-5 text-sm font-medium text-slate-950 transition-colors hover:bg-slate-100"
+                >
+                  Browse Products
+                </Link>
+                <Link
+                  href="/contact"
+                  className="inline-flex h-12 items-center justify-center rounded-[3px] border border-white/15 !bg-black px-5 text-sm font-medium !text-white transition-colors hover:bg-slate-900"
+                >
+                  Contact Us
+                </Link>
+              </div>
+
+              <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-white/10 pt-6 text-[0.72rem] font-medium uppercase tracking-[0.2em] text-slate-200/78">
+                {trustIndicators.map((item, index) => (
+                  <div key={item} className="flex items-center gap-4">
+                    <span>{item}</span>
+                    {index < trustIndicators.length - 1 ? <span className="h-1 w-1 rounded-full bg-slate-500/80" /> : null}
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-white/10 pt-6 text-[0.72rem] font-medium uppercase tracking-[0.2em] text-slate-200/78">
-              {trustIndicators.map((item, index) => (
-                <div key={item} className="flex items-center gap-4">
-                  <span>{item}</span>
-                  {index < trustIndicators.length - 1 ? <span className="h-1 w-1 rounded-full bg-slate-500/80" /> : null}
-                </div>
-              ))}
-            </div>
+            <HeroQuoteForm />
           </div>
         </div>
       </section>
@@ -195,7 +199,7 @@ export default async function Home() {
             </div>
 
             <p className="mx-auto mt-6 max-w-2xl text-sm leading-6 text-slate-500">
-              We keep the experience technical and operational: verified sourcing, practical fitment guidance, and a response style built for industrial buyers who need parts that work the first time.
+              We keep sourcing verified, fitment guidance practical, and our response fast, so industrial buyers get parts that work the first time.
             </p>
           </section>
         </RevealOnScroll>
@@ -204,7 +208,7 @@ export default async function Home() {
             <div className="relative aspect-[4/3] overflow-hidden rounded-[6px] border border-slate-200 bg-slate-100 shadow-[0_16px_48px_rgba(15,23,42,0.08)]">
               <Image
                 src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=1200&q=80"
-                alt="Our Mission — industrial plant operations"
+                alt="Our Mission, industrial plant operations"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
@@ -216,13 +220,13 @@ export default async function Home() {
               <h2 className="text-4xl font-semibold tracking-tight text-slate-950">Our Mission</h2>
               <div className="space-y-4 text-[0.96rem] leading-7 text-slate-600">
                 <p>
-                  At Best Hydraulics, our mission is to be the most dependable industrial components partner for maintenance engineers, OEM procurement teams, and plant operations managers across India. We believe that the right part, arriving at the right time, is the difference between a plant running at capacity and one standing still.
+                  We work to be the most dependable industrial components partner for maintenance engineers, OEM procurement teams, and plant operations managers across India. We believe the right part, arriving at the right time, keeps a plant running instead of standing still.
                 </p>
                 <p>
-                  We source every product through a verified supply chain — from hydraulic hoses and pressure fittings to pneumatic cylinders and industrial rubber seals — holding each to strict dimensional and material standards before it reaches your facility. Our team is built around engineers, not just salespeople, which means our guidance is grounded in real application knowledge.
+                  We source every product through a verified supply chain, from hydraulic hoses and pressure fittings to pneumatic cylinders and industrial rubber seals, and we hold each one to strict dimensional and material standards before it reaches your facility. Engineers run our team, not just salespeople, so our guidance comes from real application knowledge.
                 </p>
                 <p>
-                  Whether you need a single replacement part urgently or a scheduled bulk order for an OEM line, we treat both with the same operational rigour. No minimum order thresholds, no opaque pricing, and no intermediary delays.
+                  Whether you need a single replacement part urgently or a scheduled bulk order for an OEM line, we treat both with the same care. We skip minimum order thresholds, keep pricing transparent, and cut out intermediary delays.
                 </p>
               </div>
             </div>
@@ -236,20 +240,20 @@ export default async function Home() {
               <h2 className="text-4xl font-semibold tracking-tight text-slate-950">Our Vision</h2>
               <div className="space-y-4 text-[0.96rem] leading-7 text-slate-600">
                 <p>
-                  We envision a future where industrial buyers across India have instant access to a verified, intelligently catalogued inventory of hydraulic, pneumatic, and rubber components — with the technical documentation, fitment data, and procurement support that has historically been locked behind large distributor relationships.
+                  We want industrial buyers across India to get instant access to a verified, intelligently catalogued inventory of hydraulic, pneumatic, and rubber components, along with the technical documentation, fitment data, and procurement support that big distributors have kept to themselves for years.
                 </p>
                 <p>
-                  Our long-term goal is to build the most trusted B2B industrial components platform in the country: one where a maintenance head in Coimbatore and a procurement manager in Pune both get the same level of access, pricing transparency, and response time previously reserved for enterprise accounts.
+                  We aim to build the most trusted B2B industrial components platform in the country, one where a maintenance head in Coimbatore and a procurement manager in Pune get the same access, pricing transparency, and response time that used to be reserved for enterprise accounts.
                 </p>
                 <p>
-                  We are investing in deeper catalogue coverage, faster logistics partnerships, and technical support tools that make sourcing faster and more reliable — not just for today&apos;s buyers, but for the next generation of industrial operations.
+                  We keep investing in deeper catalogue coverage, faster logistics partnerships, and technical support tools, so we make sourcing faster and more reliable for today&apos;s buyers and the next generation of industrial operations.
                 </p>
               </div>
             </div>
             <div className="relative aspect-[4/3] overflow-hidden rounded-[6px] border border-slate-200 bg-slate-100 shadow-[0_16px_48px_rgba(15,23,42,0.08)]">
               <Image
                 src="https://images.unsplash.com/photo-1565043666747-69f6646db940?auto=format&fit=crop&w=1200&q=80"
-                alt="Our Vision — future of industrial sourcing"
+                alt="Our Vision, future of industrial sourcing"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
@@ -277,8 +281,6 @@ export default async function Home() {
             </div>
           </section>
         </RevealOnScroll>
-
-
       </div>
     </div>
   );

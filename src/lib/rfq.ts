@@ -1,5 +1,6 @@
 import { getCatalog } from "@/lib/catalog";
 import { formatINR } from "@/lib/currency";
+import { specsLabel } from "@/lib/specs";
 import type { CartLineInput } from "@/lib/types";
 
 export type RfqCustomer = {
@@ -18,7 +19,7 @@ export type ResolvedRfqLine = {
   productName: string;
   category: string;
   dimension: string;
-  color: string;
+  specs: string;
   quantity: number;
   unitPrice: number;
   lineTotal: number;
@@ -78,9 +79,7 @@ export async function resolveRfq(
     errors.push({ field: "phoneNumber", message: "Enter a valid phone number" });
   }
 
-  if (!customer.emailId) {
-    errors.push({ field: "emailId", message: "Email ID is required" });
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(customer.emailId)) {
+  if (customer.emailId && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(customer.emailId)) {
     errors.push({ field: "emailId", message: "Enter a valid email address" });
   }
 
@@ -118,7 +117,7 @@ export async function resolveRfq(
       productName: product.name,
       category: product.category,
       dimension: variant.dimension,
-      color: variant.color,
+      specs: specsLabel(variant.specs),
       quantity,
       unitPrice: variant.price,
       lineTotal: variant.price * quantity,
@@ -157,7 +156,7 @@ export function renderRfqText(rfq: ResolvedRfq) {
           .map(
             (line, index) =>
               `${index + 1}. ${line.productName}\n` +
-              `   ${line.category} | ${line.dimension} | ${line.color}\n` +
+              `   ${line.category} | ${line.dimension}${line.specs ? ` | ${line.specs}` : ""}\n` +
               `   Qty: ${line.quantity} x ${formatINR(line.unitPrice)} = ${formatINR(line.lineTotal)}`,
           )
           .join("\n")
@@ -169,7 +168,7 @@ export function renderRfqText(rfq: ResolvedRfq) {
     `Name: ${customer.name}`,
     `Business Name: ${customer.businessName || "-"}`,
     `Phone Number: ${customer.phoneNumber}`,
-    `Email ID: ${customer.emailId}`,
+    `Email ID: ${customer.emailId || "-"}`,
     `Extra Message: ${customer.message || "-"}`,
     "",
     "CART ITEMS",
@@ -192,7 +191,7 @@ export function renderRfqHtml(rfq: ResolvedRfq) {
               <tr>
                 <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;">
                   <strong style="color:#0f172a;">${escapeHtml(line.productName)}</strong><br>
-                  <span style="color:#64748b;font-size:13px;">${escapeHtml(line.category)} / ${escapeHtml(line.dimension)} / ${escapeHtml(line.color)}</span>
+                  <span style="color:#64748b;font-size:13px;">${escapeHtml(line.category)} / ${escapeHtml(line.dimension)}${line.specs ? ` / ${escapeHtml(line.specs)}` : ""}</span>
                 </td>
                 <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;text-align:center;color:#0f172a;">${line.quantity}</td>
                 <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;text-align:right;color:#0f172a;">${escapeHtml(formatINR(line.unitPrice))}</td>
@@ -222,7 +221,7 @@ export function renderRfqHtml(rfq: ResolvedRfq) {
           ${field("Name", escapeHtml(customer.name))}
           ${field("Business Name", escapeHtml(customer.businessName || "-"))}
           ${field("Phone Number", `<a href="tel:${escapeHtml(customer.phoneNumber)}" style="color:#1d4ed8;">${escapeHtml(customer.phoneNumber)}</a>`)}
-          ${field("Email ID", `<a href="mailto:${escapeHtml(customer.emailId)}" style="color:#1d4ed8;">${escapeHtml(customer.emailId)}</a>`)}
+          ${field("Email ID", customer.emailId ? `<a href="mailto:${escapeHtml(customer.emailId)}" style="color:#1d4ed8;">${escapeHtml(customer.emailId)}</a>` : "-")}
           ${field("Extra Message", escapeHtml(customer.message || "-"))}
         </table>
 
@@ -272,7 +271,7 @@ export function renderRfqWhatsApp(rfq: ResolvedRfq) {
     `*Name:* ${customer.name}`,
     customer.businessName ? `*Business:* ${customer.businessName}` : null,
     `*Phone:* ${customer.phoneNumber}`,
-    `*Email:* ${customer.emailId}`,
+    customer.emailId ? `*Email:* ${customer.emailId}` : null,
     customer.message ? `*Message:* ${customer.message}` : null,
     "",
     "*Items*",

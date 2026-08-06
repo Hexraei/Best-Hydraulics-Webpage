@@ -39,7 +39,7 @@ async function loadProducts(): Promise<AdminProduct[]> {
         .map((variant) => ({
           id: variant.id,
           dimension: variant.dimension,
-          color: variant.color,
+          specs: variant.specs,
           sku: variant.sku,
           price: variant.price,
           stock: variant.stock,

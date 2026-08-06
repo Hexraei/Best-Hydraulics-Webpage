@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Product } from "@/lib/types";
 import { useCart } from "@/components/cart-provider";
 import { formatINR } from "@/lib/currency";
+import { specsLabel } from "@/lib/specs";
 
 export function AddToCartPanel({ product }: { product: Product }) {
   const [variantId, setVariantId] = useState(product.variants[0]?.id ?? "");
@@ -27,7 +28,7 @@ export function AddToCartPanel({ product }: { product: Product }) {
           >
             {product.variants.map((variant) => (
               <option key={variant.id} value={variant.id}>
-                {variant.dimension} • {variant.color}
+                {variant.specs.length ? `${variant.dimension} • ${specsLabel(variant.specs)}` : variant.dimension}
               </option>
             ))}
           </select>
@@ -36,8 +37,6 @@ export function AddToCartPanel({ product }: { product: Product }) {
         <div className="grid grid-cols-2 gap-3 rounded-[4px] border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
           <p className="text-slate-500">Price</p>
           <p className="text-right font-semibold text-slate-950">{selected ? formatINR(selected.price) : "-"}</p>
-          <p className="text-slate-500">Stock</p>
-          <p className="text-right text-slate-900">{selected ? `${selected.stock} units` : "-"}</p>
         </div>
 
         <div>

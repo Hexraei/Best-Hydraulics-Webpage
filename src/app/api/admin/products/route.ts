@@ -10,11 +10,25 @@ export const dynamic = "force-dynamic";
 type VariantInput = {
   id?: number;
   dimension?: unknown;
-  color?: unknown;
+  specs?: unknown;
   sku?: unknown;
   price?: unknown;
   stock?: unknown;
 };
+
+function cleanSpecs(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((entry) => {
+      if (!entry || typeof entry !== "object") return null;
+      const spec = entry as Record<string, unknown>;
+      const name = str(spec.name, 80);
+      const specValue = str(spec.value, 200);
+      return name && specValue ? { name, value: specValue } : null;
+    })
+    .filter((spec): spec is { name: string; value: string } => spec !== null)
+    .slice(0, 20);
+}
 
 function slugify(value: string) {
   return value
@@ -108,7 +122,7 @@ export async function POST(request: Request) {
 
     cleanVariants.push({
       dimension,
-      color: str(variant.color, 60),
+      specs: cleanSpecs(variant.specs),
       sku: str(variant.sku, 120) || null,
       price,
       stock: Number.isFinite(stock) && stock >= 0 ? stock : 0,

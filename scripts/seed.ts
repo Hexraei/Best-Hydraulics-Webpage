@@ -59,7 +59,7 @@ async function main() {
       product.variants.map((variant, variantIndex) => ({
         productId: row.id,
         dimension: variant.dimension,
-        color: variant.color,
+        specs: variant.specs,
         price: variant.price,
         stock: variant.stock,
         sortOrder: variantIndex,

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
+import { RequestQuoteForm } from "@/components/request-quote-form";
 
 export const metadata: Metadata = {
   title: "Contact Us | Sourcing & RFQ Support - Best Hydraulics",
@@ -143,6 +144,8 @@ export default function ContactPage() {
                 <li>Technical clarification for maintenance teams</li>
               </ul>
             </div>
+
+            <RequestQuoteForm />
           </aside>
         </div>
       </div>

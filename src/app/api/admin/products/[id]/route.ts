@@ -16,6 +16,20 @@ function int(value: unknown) {
   return Number.isFinite(parsed) ? Math.trunc(parsed) : NaN;
 }
 
+function cleanSpecs(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((entry) => {
+      if (!entry || typeof entry !== "object") return null;
+      const spec = entry as Record<string, unknown>;
+      const name = str(spec.name, 80);
+      const specValue = str(spec.value, 200);
+      return name && specValue ? { name, value: specValue } : null;
+    })
+    .filter((spec): spec is { name: string; value: string } => spec !== null)
+    .slice(0, 20);
+}
+
 async function guard() {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ message: "Not authorised" }, { status: 401 });
@@ -48,11 +62,16 @@ export async function PATCH(
   const db = getDb();
 
   const updates: Record<string, unknown> = { updatedAt: new Date() };
-  const textFields: [string, string, number][] = [
+
+  // These columns are NOT NULL (family/description default to ""), so an empty
+  // value must be saved as "", not null — unlike the nullable fields below.
+  const requiredTextFields: [string, string, number][] = [
     ["name", "name", 250],
     ["category", "category", 80],
     ["family", "family", 120],
     ["description", "description", 5000],
+  ];
+  const nullableTextFields: [string, string, number][] = [
     ["brand", "brand", 120],
     ["material", "material", 120],
     ["pressureRating", "pressureRating", 60],
@@ -62,7 +81,10 @@ export async function PATCH(
     ["image", "image", 1000],
   ];
 
-  for (const [key, column, max] of textFields) {
+  for (const [key, column, max] of requiredTextFields) {
+    if (body[key] !== undefined) updates[column] = str(body[key], max);
+  }
+  for (const [key, column, max] of nullableTextFields) {
     if (body[key] !== undefined) updates[column] = str(body[key], max) || null;
   }
 
@@ -96,7 +118,7 @@ export async function PATCH(
       clean.push({
         productId,
         dimension,
-        color: str(variant.color, 60),
+        specs: cleanSpecs(variant.specs),
         sku: str(variant.sku, 120) || null,
         price,
         stock: Number.isFinite(stock) && stock >= 0 ? stock : 0,

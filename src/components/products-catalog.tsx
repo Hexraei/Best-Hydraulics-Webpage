@@ -88,10 +88,13 @@ function FilterGroup({
   );
 }
 
+const PAGE_SIZE = 24;
+
 export function ProductsCatalog({ products }: { products: Product[] }) {
   const [query, setQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const searchParams = useSearchParams();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -244,6 +247,17 @@ export function ProductsCatalog({ products }: { products: Product[] }) {
     return result;
   }, [products, submittedQuery, selectedFilters]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [submittedQuery, selectedFilters]);
+
+  const totalResultsCount = filteredProducts.length;
+  const totalPages = Math.max(1, Math.ceil(totalResultsCount / PAGE_SIZE));
+  const pagedProducts = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredProducts.slice(start, start + PAGE_SIZE);
+  }, [filteredProducts, currentPage]);
+
   const onSearch = () => {
     setSubmittedQuery(query);
     setHasSearched(true);
@@ -254,8 +268,6 @@ export function ProductsCatalog({ products }: { products: Product[] }) {
     setSubmittedQuery("");
     setHasSearched(false);
   };
-
-  const totalResultsCount = filteredProducts.length;
 
   return (
     <div className="bg-slate-50/70">
@@ -365,7 +377,7 @@ export function ProductsCatalog({ products }: { products: Product[] }) {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {filteredProducts.map((product) => (
+              {pagedProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
@@ -377,6 +389,27 @@ export function ProductsCatalog({ products }: { products: Product[] }) {
                   className="mt-4 inline-flex h-10 items-center justify-center rounded-[3px] border border-slate-950 bg-slate-950 px-4 text-sm font-medium text-white transition-colors hover:bg-slate-800"
                 >
                   Reset All Filters
+                </button>
+              </div>
+            )}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 pt-4">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="inline-flex h-10 items-center justify-center rounded-[3px] border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Previous
+                </button>
+                <span className="px-2 text-sm font-medium text-slate-600">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="inline-flex h-10 items-center justify-center rounded-[3px] border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Next
                 </button>
               </div>
             )}

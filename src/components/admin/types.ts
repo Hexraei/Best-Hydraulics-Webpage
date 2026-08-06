@@ -1,7 +1,9 @@
+export type AdminVariantSpec = { name: string; value: string };
+
 export type AdminVariant = {
   id?: number;
   dimension: string;
-  color: string;
+  specs: AdminVariantSpec[];
   sku: string | null;
   price: number;
   stock: number;
@@ -37,7 +39,7 @@ export type AdminQuote = {
     productName: string;
     category: string;
     dimension: string;
-    color: string;
+    specs: string;
     quantity: number;
     unitPrice: number;
     lineTotal: number;
@@ -67,6 +69,6 @@ export function emptyProduct(): AdminProduct {
     image: null,
     gallery: [],
     published: true,
-    variants: [{ dimension: "", color: "", sku: null, price: 0, stock: 0 }],
+    variants: [{ dimension: "", specs: [], sku: null, price: 0, stock: 0 }],
   };
 }

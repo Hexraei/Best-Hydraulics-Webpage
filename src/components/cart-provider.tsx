@@ -9,6 +9,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { Product, ProductVariant } from "@/lib/types";
+import { specsLabel } from "@/lib/specs";
 
 /**
  * Cart lines are self-contained: they carry the image, category, and the full
@@ -30,6 +31,18 @@ type CartLine = {
 
 const STORAGE_KEY = "best-hydraulics-cart-v1";
 
+function isVariantOption(value: unknown): value is ProductVariant {
+  if (!value || typeof value !== "object") return false;
+  const option = value as Record<string, unknown>;
+  return (
+    typeof option.id === "string" &&
+    typeof option.dimension === "string" &&
+    typeof option.price === "number" &&
+    typeof option.stock === "number" &&
+    Array.isArray(option.specs)
+  );
+}
+
 function isCartLine(value: unknown): value is CartLine {
   if (!value || typeof value !== "object") return false;
   const line = value as Record<string, unknown>;
@@ -40,7 +53,8 @@ function isCartLine(value: unknown): value is CartLine {
     typeof line.dimension === "string" &&
     typeof line.quantity === "number" &&
     typeof line.unitPrice === "number" &&
-    Array.isArray(line.options)
+    Array.isArray(line.options) &&
+    line.options.every(isVariantOption)
   );
 }
 
@@ -159,7 +173,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         {
           ...source,
           variantId: newVariant.id,
-          dimension: `${newVariant.dimension} • ${newVariant.color}`,
+          dimension: newVariant.specs.length
+            ? `${newVariant.dimension} • ${specsLabel(newVariant.specs)}`
+            : newVariant.dimension,
           unitPrice: newVariant.price,
         },
       ];

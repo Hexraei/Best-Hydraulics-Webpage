@@ -1,7 +1,9 @@
+export type VariantSpec = { name: string; value: string };
+
 export type ProductVariant = {
   id: string;
   dimension: string;
-  color: string;
+  specs: VariantSpec[];
   price: number;
   stock: number;
 };

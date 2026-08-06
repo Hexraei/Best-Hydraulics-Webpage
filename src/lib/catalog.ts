@@ -13,7 +13,7 @@ function toProduct(row: ProductRow, rows: VariantRow[]): Product {
   const variants = rows.map((variant) => ({
     id: String(variant.id),
     dimension: variant.dimension,
-    color: variant.color,
+    specs: variant.specs,
     price: variant.price,
     stock: variant.stock,
   }));

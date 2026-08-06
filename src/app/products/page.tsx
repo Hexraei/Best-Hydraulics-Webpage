@@ -2,8 +2,9 @@ import { Suspense } from "react";
 import { CatalogFallback, ProductsCatalog } from "@/components/products-catalog";
 import { getCatalog } from "@/lib/catalog";
 
-// Products come from the database, so this route must not be baked at build time.
-export const dynamic = "force-dynamic";
+// Products come from the database and change rarely (admin edits), so the page
+// is cached and refreshed in the background rather than re-queried on every hit.
+export const revalidate = 60;
 
 export default async function ProductsPage() {
   const products = await getCatalog();

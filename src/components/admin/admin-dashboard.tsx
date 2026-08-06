@@ -195,14 +195,14 @@ export function AdminDashboard({
                       key={product.id}
                       className="flex flex-wrap items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 sm:flex-nowrap"
                     >
-                      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+                      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md border border-slate-200 bg-white p-2">
                         {product.image ? (
                           <Image
                             src={product.image}
                             alt=""
                             fill
                             sizes="80px"
-                            className="object-cover"
+                            className="object-contain"
                           />
                         ) : (
                           <span className="flex h-full items-center justify-center text-xs text-slate-400">

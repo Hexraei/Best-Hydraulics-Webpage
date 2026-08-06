@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { ImageUploader } from "@/components/admin/image-uploader";
-import { CATEGORIES, type AdminProduct, type AdminVariant } from "@/components/admin/types";
+import { CATEGORIES, type AdminProduct, type AdminVariant, type AdminVariantSpec } from "@/components/admin/types";
 
 const inputClass =
   "h-14 w-full rounded-md border-2 border-slate-300 bg-white px-4 text-base text-slate-900 outline-none focus:border-slate-900";
@@ -61,11 +61,28 @@ export function ProductForm({
   const addVariant = () =>
     setForm((prev) => ({
       ...prev,
-      variants: [...prev.variants, { dimension: "", color: "", sku: null, price: 0, stock: 0 }],
+      variants: [...prev.variants, { dimension: "", specs: [], sku: null, price: 0, stock: 0 }],
     }));
 
   const removeVariant = (index: number) =>
     setForm((prev) => ({ ...prev, variants: prev.variants.filter((_, i) => i !== index) }));
+
+  const addSpec = (variantIndex: number) =>
+    setVariant(variantIndex, {
+      specs: [...form.variants[variantIndex].specs, { name: "", value: "" }],
+    });
+
+  const setSpec = (variantIndex: number, specIndex: number, patch: Partial<AdminVariantSpec>) =>
+    setVariant(variantIndex, {
+      specs: form.variants[variantIndex].specs.map((spec, i) =>
+        i === specIndex ? { ...spec, ...patch } : spec,
+      ),
+    });
+
+  const removeSpec = (variantIndex: number, specIndex: number) =>
+    setVariant(variantIndex, {
+      specs: form.variants[variantIndex].specs.filter((_, i) => i !== specIndex),
+    });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -230,6 +247,44 @@ export function ProductForm({
                       placeholder="10"
                     />
                   </label>
+                </div>
+
+                <div className="mt-4 border-t border-slate-200 pt-3">
+                  <p className="text-sm font-semibold text-slate-700">
+                    Other details <span className="font-normal text-slate-500">(optional — Range, Model No., Color, etc.)</span>
+                  </p>
+                  <div className="mt-2 space-y-2">
+                    {variant.specs.map((spec, specIndex) => (
+                      <div key={specIndex} className="flex items-center gap-2">
+                        <input
+                          value={spec.name}
+                          onChange={(event) => setSpec(index, specIndex, { name: event.target.value })}
+                          className={`${inputClass} h-11`}
+                          placeholder="Name (e.g. Range)"
+                        />
+                        <input
+                          value={spec.value}
+                          onChange={(event) => setSpec(index, specIndex, { value: event.target.value })}
+                          className={`${inputClass} h-11`}
+                          placeholder="Value (e.g. 2-280 Kg/Cm2)"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeSpec(index, specIndex)}
+                          className="shrink-0 rounded px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => addSpec(index)}
+                    className="mt-2 h-11 w-full rounded-md border-2 border-dashed border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    + Add a detail
+                  </button>
                 </div>
               </div>
             ))}

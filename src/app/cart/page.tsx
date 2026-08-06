@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useCart } from "@/components/cart-provider";
 import { formatINR } from "@/lib/currency";
+import { specsLabel } from "@/lib/specs";
 
 function CartItemImage({ productName, image }: { productName: string; image?: string }) {
   if (!image) {
     return <div className="h-full w-full bg-slate-100" />;
   }
 
-  return <Image src={image} alt={productName} fill sizes="120px" className="object-cover" />;
+  return <Image src={image} alt={productName} fill sizes="120px" className="object-contain" />;
 }
 
 export default function CartPage() {
@@ -173,7 +174,7 @@ export default function CartPage() {
                       className="rounded-[4px] border border-slate-200 bg-white p-4 shadow-[0_10px_26px_rgba(15,23,42,0.04)]"
                     >
                       <div className="grid gap-4 md:grid-cols-[120px_minmax(0,1fr)]">
-                        <div className="relative aspect-square overflow-hidden rounded-[4px] border border-slate-200 bg-slate-100">
+                        <div className="relative aspect-square overflow-hidden rounded-[4px] border border-slate-200 bg-white p-2">
                           <CartItemImage productName={line.productName} image={line.image} />
                         </div>
 
@@ -200,7 +201,7 @@ export default function CartPage() {
                               >
                                 {line.options.map((item) => (
                                   <option key={item.id} value={item.id}>
-                                    {item.dimension} • {item.color}
+                                    {item.specs?.length ? `${item.dimension} • ${specsLabel(item.specs)}` : item.dimension}
                                   </option>
                                 ))}
                               </select>
@@ -327,11 +328,6 @@ export default function CartPage() {
               </div>
             </form>
           </aside>
-        </div>
-
-        <div className="mt-6 rounded-[4px] border border-slate-200 bg-white px-5 py-4 text-sm leading-6 text-slate-600 shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
-          You can also send a blank request form just to get an enquiry callback, or contact us through WhatsApp or phone. When a
-          request quote is sent with cart items, we will get back to you regarding prices and services as soon as possible.
         </div>
       </div>
     </div>
