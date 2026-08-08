@@ -3,7 +3,7 @@
  * once the real domain is live so sitemap, robots, and OpenGraph tags emit
  * absolute URLs that point at production.
  */
-export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://besthydraulics.online").replace(/\/$/, "");
+export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.besthydraulics.online").replace(/\/$/, "");
 
 export const siteName = "Best Hydraulics";
 

@@ -25,12 +25,14 @@ export async function generateMetadata({
     return {
       title: "Product Not Found - Best Hydraulics",
       description: "The requested industrial product was not found in our catalog.",
+      robots: { index: false, follow: true },
     };
   }
 
   return {
     title: `${product.name} | ${product.category} - Best Hydraulics`,
     description: `Buy ${product.name}${product.family ? ` (${product.family})` : ""}. ${product.description} Sourcing spare parts for plant maintenance and OEM procurement.`,
+    alternates: { canonical: `/products/${slug}` },
     openGraph: {
       title: `${product.name} - Best Hydraulics`,
       description: product.description,

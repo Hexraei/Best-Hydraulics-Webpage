@@ -7,8 +7,9 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        // Nothing here is useful in search results, and /cart is per-visitor.
-        disallow: ["/api/", "/cart"],
+        // Nothing here is useful in search results: /cart is per-visitor and
+        // /admin is the private product manager.
+        disallow: ["/api/", "/cart", "/admin"],
       },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,

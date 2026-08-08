@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
@@ -5,6 +6,10 @@ import { IndustrialHeroSlideshow } from "@/components/industrial-hero-slideshow"
 import { ProductCard } from "@/components/product-card";
 import { HeroQuoteForm } from "@/components/hero-quote-form";
 import { getCatalog } from "@/lib/catalog";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 const categoryTiles = [
   {
@@ -224,6 +229,9 @@ export default async function Home() {
                 </p>
                 <p>
                   We source every product through a verified supply chain, from hydraulic hoses and pressure fittings to pneumatic cylinders and industrial rubber seals, and we hold each one to strict dimensional and material standards before it reaches your facility. Engineers run our team, not just salespeople, so our guidance comes from real application knowledge.
+                </p>
+                <p>
+                  We also handle hydraulic and pneumatic maintenance service, with a dedicated service engineer on hand for servicing hydraulic and pneumatic systems on-site.
                 </p>
                 <p>
                   Whether you need a single replacement part urgently or a scheduled bulk order for an OEM line, we treat both with the same care. We skip minimum order thresholds, keep pricing transparent, and cut out intermediary delays.

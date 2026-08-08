@@ -5,6 +5,7 @@ import { RequestQuoteForm } from "@/components/request-quote-form";
 export const metadata: Metadata = {
   title: "Contact Us | Sourcing & RFQ Support - Best Hydraulics",
   description: "Get in touch with Best Hydraulics for procurement-ready pricing, industrial quotations, and shipping coordination across India.",
+  alternates: { canonical: "/contact" },
 };
 
 function PhoneIcon() {
@@ -108,7 +109,7 @@ export default function ContactPage() {
                     <MailIcon />
                     <span>besthydraulicss@gmail.com</span>
                   </a>
-                  <p className="text-slate-300">GSTIN: 33AAGFR3877A1ZD</p>
+                  <p className="text-slate-300">GSTIN: 33ACGPN4781M1Z6</p>
                 </div>
               </ContactCard>
 
@@ -132,7 +133,10 @@ export default function ContactPage() {
             <div className="rounded-[4px] border border-slate-200 bg-slate-950 p-6 text-white shadow-[0_10px_26px_rgba(15,23,42,0.08)]">
               <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slate-200/75">Operating hours</p>
               <p className="mt-3 text-lg font-semibold">Monday to Saturday</p>
-              <p className="mt-1 text-sm text-slate-300">9:00 AM - 6:00 PM</p>
+              <p className="mt-1 text-sm text-slate-300">9:30 AM - 9:00 PM</p>
+              <p className="mt-3 text-lg font-semibold">Sunday</p>
+              <p className="mt-1 text-sm text-slate-300">10:30 AM - 1:00 PM</p>
+              <p className="mt-3 text-sm text-slate-400">Closed Friday 12:30 PM - 2:30 PM for prayer</p>
             </div>
 
             <div className="rounded-[4px] border border-slate-200 bg-white p-6 shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
@@ -140,6 +144,7 @@ export default function ContactPage() {
               <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-600">
                 <li>Industrial quotations and bulk supply</li>
                 <li>Hydraulic and pneumatic component sourcing</li>
+                <li>Hydraulic and pneumatic maintenance service, with a dedicated service engineer for on-site servicing</li>
                 <li>Dispatch coordination and support follow-up</li>
                 <li>Technical clarification for maintenance teams</li>
               </ul>

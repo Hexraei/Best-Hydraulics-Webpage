@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Shipping & Delivery",
+  description:
+    "Dispatch timelines, freight options, and delivery coverage for Best Hydraulics orders across India.",
+  alternates: { canonical: "/shipping" },
+};
 
 export default function ShippingPage() {
   return (

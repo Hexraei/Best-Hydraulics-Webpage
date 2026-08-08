@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Terms & Conditions",
+  description:
+    "Payment terms, order confirmation, and supply conditions for purchases from Best Hydraulics.",
+  alternates: { canonical: "/terms" },
+};
 
 export default function TermsPage() {
   return (

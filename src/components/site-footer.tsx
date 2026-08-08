@@ -43,7 +43,9 @@ export function SiteFooter() {
             Industrial supply partner for hydraulics, pneumatics, and industrial rubber components with verified stock and technical support.
           </p>
           <div className="mt-4 space-y-1 text-sm text-slate-400">
-            <p>GSTIN: 33AAGFR3877A1ZD</p>
+            <p>GSTIN: 33ACGPN4781M1Z6</p>
+            <p>Mon-Sat 9:30 AM - 9:00 PM • Sun 10:30 AM - 1:00 PM</p>
+            <p>Friday closed 12:30 PM - 2:30 PM for prayer</p>
           </div>
           <div className="mt-5">
             <Link
