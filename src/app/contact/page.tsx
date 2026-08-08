@@ -78,7 +78,7 @@ export default function ContactPage() {
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <section className="rounded-[4px] border border-slate-200 bg-white p-6 shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
             <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slate-500">Best Hydraulics</p>
-            <h2 className="brand-font mt-2 text-3xl font-semibold tracking-tight text-slate-950">Providing reliable spare parts since 2006</h2>
+            <h2 className="brand-font mt-2 text-3xl font-semibold tracking-tight text-slate-950">Providing reliable spare parts since 2017</h2>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-600">
               We support industrial buyers, maintenance teams, and OEM sourcing with direct contact, practical response times, and
               straightforward procurement handling.
@@ -104,9 +104,9 @@ export default function ContactPage() {
 
               <ContactCard title="Email and GSTIN">
                 <div className="space-y-3 text-sm text-slate-100">
-                  <a href="mailto:alfaruberss@gmail.com" className="flex items-center gap-3 transition-colors hover:text-white">
+                  <a href="mailto:besthydraulicss@gmail.com" className="flex items-center gap-3 transition-colors hover:text-white">
                     <MailIcon />
-                    <span>alfaruberss@gmail.com</span>
+                    <span>besthydraulicss@gmail.com</span>
                   </a>
                   <p className="text-slate-300">GSTIN: 33AAGFR3877A1ZD</p>
                 </div>

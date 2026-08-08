@@ -90,9 +90,9 @@ export function SiteFooter() {
               <PhoneIcon />
               <span>98425 75335</span>
             </a>
-            <a href="mailto:alfaruberss@gmail.com" className="flex items-center gap-3 transition-colors hover:text-white">
+            <a href="mailto:besthydraulicss@gmail.com" className="flex items-center gap-3 transition-colors hover:text-white">
               <MailIcon />
-              <span>alfaruberss@gmail.com</span>
+              <span>besthydraulicss@gmail.com</span>
             </a>
             <a
               href={mapsUrl}
@@ -110,7 +110,7 @@ export function SiteFooter() {
       <div className="border-t border-slate-800">
         <div className="container flex flex-col gap-3 py-6 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
           <div>© {new Date().getFullYear()} Best Hydraulics. All rights reserved.</div>
-          <div>Providing reliable spare parts since 2006</div>
+          <div>Providing reliable spare parts since 2017</div>
         </div>
       </div>
     </footer>

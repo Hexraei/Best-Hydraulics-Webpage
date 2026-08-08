@@ -85,7 +85,7 @@ export default function RootLayout({
               url: siteUrl,
               image: `${siteUrl}/images/hero-catalog.jpg`,
               telephone: ["+919994703528", "+919443410833", "+919842575335"],
-              email: "alfaruberss@gmail.com",
+              email: "besthydraulicss@gmail.com",
               address: {
                 "@type": "PostalAddress",
                 streetAddress: "Kasthuri Complex, No 6 Chann bazzar, Madurai Rd, Tharanallur",

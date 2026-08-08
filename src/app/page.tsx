@@ -46,7 +46,7 @@ export default async function Home() {
           <div className="grid w-full items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]">
             <div>
               <p className="text-[0.72rem] font-semibold uppercase tracking-[0.26em] text-slate-200/82">
-                Proving Trust since 2006
+                Proving Trust since 2017
               </p>
               <h1 className="mt-4 text-5xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
                 Best Hydraulics

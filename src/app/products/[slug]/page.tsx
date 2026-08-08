@@ -3,10 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { AddToCartPanel } from "@/components/add-to-cart-panel";
+import { FitToWidth } from "@/components/fit-to-width";
 import { BrandBadge } from "@/components/brand-badge";
 import { formatINR } from "@/lib/currency";
 import { getCatalogProductBySlug } from "@/lib/catalog";
-import { orderedSpecNames } from "@/lib/specs";
+import { orderedSpecNames, buildPriceGrid } from "@/lib/specs";
 
 // Same reasoning as the products list: cache and refresh in the background
 // instead of hitting the database on every page view.
@@ -29,7 +30,7 @@ export async function generateMetadata({
 
   return {
     title: `${product.name} | ${product.category} - Best Hydraulics`,
-    description: `Buy ${product.name} (${product.family}). ${product.description} Sourcing spare parts for plant maintenance and OEM procurement.`,
+    description: `Buy ${product.name}${product.family ? ` (${product.family})` : ""}. ${product.description} Sourcing spare parts for plant maintenance and OEM procurement.`,
     openGraph: {
       title: `${product.name} - Best Hydraulics`,
       description: product.description,
@@ -37,12 +38,6 @@ export async function generateMetadata({
     },
   };
 }
-
-const applicationMap: Record<string, string[]> = {
-  Hydraulics: ["Plant maintenance", "Machine tools", "Pressure transfer", "OEM assemblies"],
-  Pneumatics: ["Automation lines", "Compressed air systems", "Actuation", "Assembly cells"],
-  "Industrial Rubber": ["Sealing", "Vibration control", "Gaskets", "Wear protection"],
-};
 
 export default async function ProductDetailPage({
   params,
@@ -55,9 +50,11 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const basePrice = Math.min(...product.variants.map((variant) => variant.price));
-  const applications = applicationMap[product.category] ?? [];
   // Model, then codes, then description, then dimensions — see orderedSpecNames.
   const specColumns = orderedSpecNames(product.variants);
+  // Two-dimension products (e.g. Bore × Stroke) render as a compact price
+  // matrix instead of one row per variant — some have hundreds of variants.
+  const priceGrid = buildPriceGrid(product.variants);
 
   return (
     <div className="bg-slate-50/70">
@@ -83,7 +80,7 @@ export default async function ProductDetailPage({
           <div className="relative px-6 py-8 lg:px-10 lg:py-10">
             <div className="space-y-3">
               <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slate-200/90">
-                {product.category} / {product.family}
+                {product.family ? `${product.category} / ${product.family}` : product.category}
               </p>
               <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">{product.name}</h1>
               <p className="max-w-3xl text-sm leading-6 text-slate-200 sm:text-[0.98rem]">{product.description}</p>
@@ -110,44 +107,26 @@ export default async function ProductDetailPage({
             </article>
 
             <article className="rounded-[4px] border border-slate-200 bg-white p-5 shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
-              <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-4">
-                <div>
-                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
-                    Technical overview
-                  </p>
-                  <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
-                    Procurement-ready product information
-                  </h2>
-                </div>
-                <span className="rounded-[3px] border border-slate-200 bg-slate-50 px-3 py-2 text-[0.72rem] font-medium uppercase tracking-[0.18em] text-slate-600">
-                  Verified component
-                </span>
+              <div className="border-b border-slate-200 pb-4">
+                <h2 className="text-2xl font-semibold tracking-tight text-slate-950">Additional Details</h2>
               </div>
 
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <div className="rounded-[4px] border border-slate-200 bg-slate-50 p-4">
                   <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
-                    Applications
+                    Description
                   </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {applications.map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-[3px] border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
+                  <p className={`mt-3 text-sm leading-6 ${product.description ? "text-slate-700" : "text-slate-400"}`}>
+                    {product.description || "Not Available"}
+                  </p>
                 </div>
 
                 <div className="rounded-[4px] border border-slate-200 bg-slate-50 p-4">
                   <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
-                    Delivery notes
+                    Notes
                   </p>
                   <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-700">
                     <li>• Bulk pricing available on request</li>
-                    <li>• Technical support available before order placement</li>
                     <li>• Inventory subject to variant selection</li>
                   </ul>
                 </div>
@@ -157,41 +136,85 @@ export default async function ProductDetailPage({
             <article className="rounded-[4px] border border-slate-200 bg-white p-5 shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
               <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-4">
                 <div>
-                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
-                    Variant schedule
-                  </p>
-                  <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
+                  <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
                     Size and pricing
                   </h2>
                 </div>
                 <p className="text-sm text-slate-600">Starting from {formatINR(basePrice)}</p>
               </div>
 
-              <div className="mt-4 overflow-hidden rounded-[4px] border border-slate-200">
-                <table className="w-full border-collapse text-sm">
-                  <thead className="bg-slate-50 text-left text-[0.72rem] uppercase tracking-[0.2em] text-slate-500">
-                    <tr>
-                      {specColumns.map((column) => (
-                        <th key={column} className="px-4 py-3">
-                          {column}
+              <div className="mt-4 rounded-[4px] border border-slate-200">
+                <FitToWidth>
+                {priceGrid ? (
+                  <table className="w-full border-collapse text-sm">
+                    <thead className="bg-slate-50 text-left text-[0.72rem] uppercase tracking-[0.2em] text-slate-500">
+                      <tr>
+                        <th className="h-14 w-28 bg-slate-50 p-0 normal-case">
+                          <div className="relative h-14 w-28">
+                            <div
+                              className="absolute inset-0"
+                              style={{
+                                background:
+                                  "linear-gradient(to top right, transparent calc(50% - 1px), #cbd5e1 calc(50% - 1px), #cbd5e1 calc(50% + 1px), transparent calc(50% + 1px))",
+                              }}
+                            />
+                            <span className="absolute right-2 top-1.5 text-[0.72rem] uppercase tracking-[0.2em] text-slate-500">
+                              {priceGrid.columnAttribute}
+                            </span>
+                            <span className="absolute bottom-1.5 left-2 text-[0.72rem] uppercase tracking-[0.2em] text-slate-500">
+                              {priceGrid.rowAttribute}
+                            </span>
+                          </div>
                         </th>
-                      ))}
-                      <th className="px-4 py-3">Price</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200">
-                    {product.variants.map((variant) => (
-                      <tr key={variant.id} className="bg-white">
-                        {specColumns.map((column) => (
-                          <td key={column} className="px-4 py-3 text-slate-600">
-                            {variant.specs.find((spec) => spec.name === column)?.value ?? ""}
-                          </td>
+                        {priceGrid.columns.map((column) => (
+                          <th key={column} className="whitespace-nowrap px-4 py-3 text-right">
+                            {column}
+                          </th>
                         ))}
-                        <td className="px-4 py-3 font-medium text-slate-900">{formatINR(variant.price)}</td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200">
+                      {priceGrid.rows.map((row) => (
+                        <tr key={row.rowValue} className="bg-white">
+                          <td className="bg-white px-4 py-3 font-medium text-slate-900">
+                            {row.rowValue}
+                          </td>
+                          {row.cells.map((price, index) => (
+                            <td key={priceGrid.columns[index]} className="whitespace-nowrap px-4 py-3 text-right text-slate-600">
+                              {price != null ? formatINR(price) : <span className="text-slate-300">—</span>}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <table className="w-full border-collapse text-sm">
+                    <thead className="bg-slate-50 text-left text-[0.72rem] uppercase tracking-[0.2em] text-slate-500">
+                      <tr>
+                        {specColumns.map((column) => (
+                          <th key={column} className="px-4 py-3">
+                            {column}
+                          </th>
+                        ))}
+                        <th className="px-4 py-3">Price</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200">
+                      {product.variants.map((variant) => (
+                        <tr key={variant.id} className="bg-white">
+                          {specColumns.map((column) => (
+                            <td key={column} className="px-4 py-3 text-slate-600">
+                              {variant.specs.find((spec) => spec.name === column)?.value ?? ""}
+                            </td>
+                          ))}
+                          <td className="px-4 py-3 font-medium text-slate-900">{formatINR(variant.price)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+                </FitToWidth>
               </div>
             </article>
           </section>
@@ -201,13 +224,25 @@ export default async function ProductDetailPage({
 
             <div className="rounded-[4px] border border-slate-200 bg-white p-5 shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
               <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
-                Procurement support
+                Product Details
               </p>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
-                <li>Technical fitment review available before order confirmation.</li>
-                <li>Bulk quotation and dispatch coordination for industrial buyers.</li>
-                <li>Reliable sourcing for maintenance, OEM, and plant operations.</li>
-              </ul>
+              <dl className="mt-4 space-y-3 text-sm">
+                {[
+                  { label: "Brand", value: product.brand },
+                  { label: "HSN Code", value: product.hsnCode },
+                  { label: "Part Number", value: product.partNumber },
+                  { label: "Material", value: product.material },
+                  { label: "Pressure Rating", value: product.pressureRating },
+                  { label: "Application", value: product.application },
+                ].map((detail) => (
+                  <div key={detail.label} className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 last:border-b-0 last:pb-0">
+                    <dt className="text-slate-500">{detail.label}</dt>
+                    <dd className={detail.value ? "font-medium text-slate-900" : "text-slate-400"}>
+                      {detail.value || "Not Available"}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             </div>
           </aside>
         </div>

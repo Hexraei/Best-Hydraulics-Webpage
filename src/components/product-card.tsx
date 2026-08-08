@@ -38,7 +38,7 @@ export function ProductCard({ product, useCategoryImage = false }: ProductCardPr
         <div className="space-y-1.5 pb-3">
           <h3 className="text-[1.02rem] font-semibold leading-[1.35] text-slate-900">{product.name}</h3>
           <p className="text-[0.72rem] uppercase tracking-[0.2em] text-slate-500">
-            {product.category} / {product.family}
+            {product.family ? `${product.category} / ${product.family}` : product.category}
           </p>
         </div>
 
