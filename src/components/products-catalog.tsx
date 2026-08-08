@@ -1,46 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
 import type { Product } from "@/lib/types";
 
-const filterGroups = [
-  {
-    title: "Product Category",
-    open: true,
-    options: ["Hydraulics", "Pneumatics", "Industrial Rubber"],
-  },
-  {
-    title: "Brand",
-    options: ["Best Hydraulics", "OEM Compatible", "Industrial Grade"],
-  },
-  {
-    title: "Material",
-    options: ["Nitrile", "EPDM", "Polyurethane", "Steel", "Rubber"],
-  },
-  {
-    title: "Size",
-    options: ["1/4 in", "3/8 in", "1/2 in", "3/4 in", "1 in"],
-  },
-  {
-    title: "Pressure Rating",
-    options: ["10 bar", "16 bar", "25 bar", "40 bar", "63 bar"],
-  },
-  {
-    title: "Industry/Application",
-    options: ["Plant Maintenance", "OEM Assembly", "Machine Shop", "Fabrication", "Automation"],
-  },
-  {
-    title: "Availability",
-    options: ["In Stock", "Dispatch Today", "Made to Order", "Bulk Supply"],
-  },
-  {
-    title: "Price Range",
-    options: ["Under ₹1,500", "₹1,500 - ₹3,000", "₹3,000 - ₹5,000", "₹5,000+"],
-  },
-];
+const PRICE_RANGES = ["Under ₹1,500", "₹1,500 - ₹3,000", "₹3,000 - ₹5,000", "₹5,000+"];
+const CATEGORIES = ["Hydraulics", "Pneumatics", "Industrial Rubber"];
+
+// Groups material values that only differ by casing or a trailing qualifier
+// (e.g. "BRASS", "Brass", "Brass & Chrome") under one filter option, so
+// shoppers see one clean "Brass" checkbox instead of three near-duplicates.
+// Purely a filter-matching concern — the stored `material` values are
+// untouched, so product pages still show the exact original text.
+function materialGroupKey(material: string) {
+  return material.trim().toLowerCase().split(/[\s&]+/)[0];
+}
 
 function FilterGroup({
   title,
@@ -79,7 +55,6 @@ function FilterGroup({
                 />
                 <span>{option}</span>
               </span>
-              <span className="text-xs text-slate-400">—</span>
             </label>
           );
         })}
@@ -90,74 +65,168 @@ function FilterGroup({
 
 const PAGE_SIZE = 24;
 
+// Comma-separated values in a single query param, e.g. ?brand=Techno,Festo —
+// keeps the URL readable and avoids Next's array-param quirks.
+function parseListParam(value: string | null) {
+  return value ? value.split(",").filter(Boolean) : [];
+}
+
+function toListParam(values: string[]) {
+  return values.length > 0 ? values.join(",") : null;
+}
+
 export function ProductsCatalog({ products }: { products: Product[] }) {
-  const [query, setQuery] = useState("");
-  const [submittedQuery, setSubmittedQuery] = useState("");
-  const [hasSearched, setHasSearched] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const searchParams = useSearchParams();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({
-    "Product Category": [],
-    "Brand": [],
-    "Material": [],
-    "Size": [],
-    "Pressure Rating": [],
-    "Industry/Application": [],
-    "Availability": [],
-    "Price Range": [],
-  });
+  // Every filterable value is derived from the actual catalog rather than a
+  // fixed list, so a filter option only ever appears if a product can match
+  // it — no more checkboxes that always return zero results.
+  const { brandOptions, materialGroups } = useMemo(() => {
+    const brands = new Set<string>();
+    const materials = new Map<string, string>(); // group key -> display label
+
+    for (const product of products) {
+      if (product.brand) brands.add(product.brand);
+      if (product.material) {
+        const key = materialGroupKey(product.material);
+        // First-seen spelling wins as the display label for the group.
+        if (!materials.has(key)) materials.set(key, product.material.trim());
+      }
+    }
+
+    return {
+      brandOptions: Array.from(brands).sort(),
+      materialGroups: Array.from(materials.entries())
+        .map(([key, label]) => ({ key, label }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    };
+  }, [products]);
+
+  // URL is the single source of truth for search/filters/page, so it survives
+  // navigating to a product and back — the browser restores this exact URL,
+  // and everything below re-derives from it.
+  const initial = useMemo(
+    () => ({
+      query: searchParams.get("q") ?? "",
+      category: parseListParam(searchParams.get("category")),
+      brand: parseListParam(searchParams.get("brand")),
+      material: parseListParam(searchParams.get("material")),
+      price: parseListParam(searchParams.get("price")),
+      page: Math.max(1, Number(searchParams.get("page")) || 1),
+    }),
+    // Deliberately only re-derived on mount — after that, this component owns
+    // the URL (via updateUrl below) rather than reacting to its own writes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const [query, setQuery] = useState(initial.query);
+  const [submittedQuery, setSubmittedQuery] = useState(initial.query);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(initial.category);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(initial.brand);
+  const [selectedMaterialKeys, setSelectedMaterialKeys] = useState<string[]>(initial.material);
+  const [selectedPrices, setSelectedPrices] = useState<string[]>(initial.price);
+  const [currentPage, setCurrentPage] = useState(initial.page);
 
   useEffect(() => {
     if (searchParams.get("focus") === "search") {
       searchInputRef.current?.focus();
     }
-  }, [searchParams]);
+    // Only meant to run for the query string this component mounted with.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  useEffect(() => {
-    const catParam = searchParams.get("category");
-    if (catParam) {
-      const timer = setTimeout(() => {
-        setSelectedFilters((prev) => {
-          if (prev["Product Category"][0] === catParam) return prev;
-          return {
-            ...prev,
-            "Product Category": [catParam],
-          };
-        });
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-  }, [searchParams]);
+  // Mirrors every piece of state into the URL so it survives a visit to a
+  // product page and back — the browser restores this exact URL and every
+  // filter/search value is re-derived from it on the way back.
+  //
+  // Uses the native History API directly rather than router.replace(): all
+  // filtering already happens client-side from the `products` prop already in
+  // memory, so there is no need to ask the server to re-render anything.
+  // router.replace() would trigger an RSC round-trip for a page like this one
+  // (Suspense boundary + useSearchParams), and in testing that round-trip
+  // reliably completed (200 response) without ever committing the resulting
+  // URL to the address bar — a bug, not a design choice. window.history.
+  // replaceState is the pattern Next's own docs recommend for exactly this
+  // "sync client state to the URL" case, and it updates the address bar
+  // synchronously with no server request at all.
+  const updateUrl = useCallback(
+    (next: {
+      query?: string;
+      category?: string[];
+      brand?: string[];
+      material?: string[];
+      price?: string[];
+      page?: number;
+    }) => {
+      const params = new URLSearchParams();
+      const q = next.query ?? submittedQuery;
+      const category = next.category ?? selectedCategories;
+      const brand = next.brand ?? selectedBrands;
+      const material = next.material ?? selectedMaterialKeys;
+      const price = next.price ?? selectedPrices;
+      const page = next.page ?? currentPage;
 
-  const handleFilterChange = (groupTitle: string, option: string, checked: boolean) => {
-    setSelectedFilters((prev) => {
-      const currentGroup = prev[groupTitle] || [];
-      const updatedGroup = checked
-        ? [...currentGroup, option]
-        : currentGroup.filter((val) => val !== option);
-      return {
-        ...prev,
-        [groupTitle]: updatedGroup,
-      };
-    });
+      if (q) params.set("q", q);
+      const categoryParam = toListParam(category);
+      if (categoryParam) params.set("category", categoryParam);
+      const brandParam = toListParam(brand);
+      if (brandParam) params.set("brand", brandParam);
+      const materialParam = toListParam(material);
+      if (materialParam) params.set("material", materialParam);
+      const priceParam = toListParam(price);
+      if (priceParam) params.set("price", priceParam);
+      if (page > 1) params.set("page", String(page));
+
+      const qs = params.toString();
+      window.history.replaceState(null, "", qs ? `/products?${qs}` : "/products");
+    },
+    [submittedQuery, selectedCategories, selectedBrands, selectedMaterialKeys, selectedPrices, currentPage],
+  );
+
+  const toggleValue = (values: string[], value: string, checked: boolean) =>
+    checked ? [...values, value] : values.filter((v) => v !== value);
+
+  const handleCategoryChange = (option: string, checked: boolean) => {
+    const next = toggleValue(selectedCategories, option, checked);
+    setSelectedCategories(next);
+    setCurrentPage(1);
+    updateUrl({ category: next, page: 1 });
+  };
+
+  const handleBrandChange = (option: string, checked: boolean) => {
+    const next = toggleValue(selectedBrands, option, checked);
+    setSelectedBrands(next);
+    setCurrentPage(1);
+    updateUrl({ brand: next, page: 1 });
+  };
+
+  const handleMaterialChange = (key: string, checked: boolean) => {
+    const next = toggleValue(selectedMaterialKeys, key, checked);
+    setSelectedMaterialKeys(next);
+    setCurrentPage(1);
+    updateUrl({ material: next, page: 1 });
+  };
+
+  const handlePriceChange = (option: string, checked: boolean) => {
+    const next = toggleValue(selectedPrices, option, checked);
+    setSelectedPrices(next);
+    setCurrentPage(1);
+    updateUrl({ price: next, page: 1 });
   };
 
   const clearAllFilters = () => {
-    setSelectedFilters({
-      "Product Category": [],
-      "Brand": [],
-      "Material": [],
-      "Size": [],
-      "Pressure Rating": [],
-      "Industry/Application": [],
-      "Availability": [],
-      "Price Range": [],
-    });
+    setSelectedCategories([]);
+    setSelectedBrands([]);
+    setSelectedMaterialKeys([]);
+    setSelectedPrices([]);
+    setCurrentPage(1);
+    updateUrl({ category: [], brand: [], material: [], price: [], page: 1 });
   };
 
-  const activeFiltersCount = Object.values(selectedFilters).reduce((sum, arr) => sum + arr.length, 0);
+  const activeFiltersCount =
+    selectedCategories.length + selectedBrands.length + selectedMaterialKeys.length + selectedPrices.length;
 
   const filteredProducts = useMemo(() => {
     let result = products;
@@ -168,90 +237,85 @@ export function ProductsCatalog({ products }: { products: Product[] }) {
     if (normalizedQuery) {
       const terms = normalizedQuery.split(/\s+/);
 
-      result = result.filter((product) => {
-        const haystack = [
-          product.name,
-          product.category,
-          product.family,
-          product.description,
-          product.brand,
-          product.material,
-          product.partNumber,
-          product.hsnCode,
-          ...product.variants.flatMap((variant) =>
-            variant.specs.flatMap((spec) => [spec.name, spec.value]),
-          ),
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
+      const matched = products
+        .map((product) => {
+          const name = (product.name ?? "").toLowerCase();
+          const haystack = [
+            product.name,
+            product.category,
+            product.family,
+            product.description,
+            product.brand,
+            product.material,
+            product.partNumber,
+            product.hsnCode,
+            ...product.variants.flatMap((variant) =>
+              variant.specs.flatMap((spec) => [spec.name, spec.value]),
+            ),
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
 
-        // Every term must appear, so extra words narrow rather than widen.
-        return terms.every((term) => haystack.includes(term));
-      });
+          // Every term must appear, so extra words narrow rather than widen.
+          const isMatch = terms.every((term) => haystack.includes(term));
+          return { product, isMatch, name };
+        })
+        .filter((entry) => entry.isMatch);
+
+      // Relevance ranking, most to least specific — otherwise results come
+      // back in whatever order products happen to sit in the database (newest
+      // insertions last), so a product whose actual name is the query can
+      // appear below one that only happens to mention it in a buried spec.
+      //
+      // Hyphens/slashes count as word separators here, same as spaces, so
+      // searching "o ring" matches a product literally named "O-Ring" — a
+      // plain substring check would miss it since "o-ring" never contains
+      // the literal text "o ring".
+      const normalizeForMatch = (value: string) => value.replace(/[-/\s]+/g, " ").trim();
+      const normalizedQueryLoose = normalizeForMatch(normalizedQuery);
+
+      const rank = ({ product, name }: { product: Product; name: string }) => {
+        const looseName = normalizeForMatch(name);
+        if (looseName === normalizedQueryLoose) return 0; // exact name match
+        if (looseName.startsWith(normalizedQueryLoose)) return 1; // name starts with query
+        if (looseName.includes(normalizedQueryLoose)) return 2; // name contains query
+        const category = normalizeForMatch(product.category ?? "");
+        const family = normalizeForMatch(product.family ?? "");
+        const brand = normalizeForMatch(product.brand ?? "");
+        const material = normalizeForMatch(product.material ?? "");
+        if ([category, family, brand, material].some((field) => field.includes(normalizedQueryLoose))) return 3;
+        const description = normalizeForMatch(product.description ?? "");
+        if (description.includes(normalizedQueryLoose)) return 4;
+        return 5; // only matched somewhere in the variant specs
+      };
+
+      result = matched
+        .map((entry) => ({ ...entry, rank: rank(entry) }))
+        .sort((a, b) => a.rank - b.rank)
+        .map((entry) => entry.product);
     }
 
-    // 2. Sidebar Filters
-    // Category
-    const selectedCats = selectedFilters["Product Category"];
-    if (selectedCats && selectedCats.length > 0) {
-      result = result.filter((product) => selectedCats.includes(product.category));
+    // 2. Category
+    if (selectedCategories.length > 0) {
+      result = result.filter((product) => selectedCategories.includes(product.category));
     }
 
-    // Brand
-    const selectedBrands = selectedFilters["Brand"];
-    if (selectedBrands && selectedBrands.length > 0) {
+    // 3. Brand
+    if (selectedBrands.length > 0) {
       result = result.filter((product) => product.brand && selectedBrands.includes(product.brand));
     }
 
-    // Material
-    const selectedMaterials = selectedFilters["Material"];
-    if (selectedMaterials && selectedMaterials.length > 0) {
-      result = result.filter((product) => product.material && selectedMaterials.includes(product.material));
+    // 4. Material — matched by normalized group key, so "BRASS" and "Brass &
+    // Chrome" both satisfy a selected "Brass" filter.
+    if (selectedMaterialKeys.length > 0) {
+      result = result.filter(
+        (product) => product.material && selectedMaterialKeys.includes(materialGroupKey(product.material)),
+      );
     }
 
-    // Size
-    const selectedSizes = selectedFilters["Size"];
-    if (selectedSizes && selectedSizes.length > 0) {
-      // Size lives in the freeform specs now, so match against every spec value.
-      result = result.filter((product) => {
-        return product.variants.some((variant) => {
-          const haystack = variant.specs.map((spec) => spec.value).join(" ").toLowerCase();
-          return selectedSizes.some((size) => haystack.includes(size.toLowerCase()));
-        });
-      });
-    }
-
-    // Pressure Rating
-    const selectedPressures = selectedFilters["Pressure Rating"];
-    if (selectedPressures && selectedPressures.length > 0) {
-      result = result.filter((product) => product.pressureRating && selectedPressures.includes(product.pressureRating));
-    }
-
-    // Industry/Application
-    const selectedApps = selectedFilters["Industry/Application"];
-    if (selectedApps && selectedApps.length > 0) {
-      result = result.filter((product) => product.application && selectedApps.includes(product.application));
-    }
-
-    // Availability
-    const selectedAvails = selectedFilters["Availability"];
-    if (selectedAvails && selectedAvails.length > 0) {
-      result = result.filter((product) => {
-        const inStock = product.variants.some((v) => v.stock > 0);
-        return selectedAvails.some((avail) => {
-          if (avail === "In Stock") return inStock;
-          if (avail === "Dispatch Today") return inStock;
-          if (avail === "Made to Order") return !inStock;
-          if (avail === "Bulk Supply") return inStock;
-          return false;
-        });
-      });
-    }
-
-    // Price Range
-    const selectedPrices = selectedFilters["Price Range"];
-    if (selectedPrices && selectedPrices.length > 0) {
+    // 5. Price Range
+    if (selectedPrices.length > 0) {
       result = result.filter((product) => {
         const minPrice = Math.min(...product.variants.map((v) => v.price));
         return selectedPrices.some((range) => {
@@ -265,28 +329,36 @@ export function ProductsCatalog({ products }: { products: Product[] }) {
     }
 
     return result;
-  }, [products, submittedQuery, selectedFilters]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [submittedQuery, selectedFilters]);
+  }, [products, submittedQuery, selectedCategories, selectedBrands, selectedMaterialKeys, selectedPrices]);
 
   const totalResultsCount = filteredProducts.length;
   const totalPages = Math.max(1, Math.ceil(totalResultsCount / PAGE_SIZE));
+  // currentPage can be stale after a filter change shrinks the result set
+  // (e.g. coming back from a product page on page 3 of a now-1-page result),
+  // so the page actually rendered is always clamped into range.
+  const safePage = Math.min(currentPage, totalPages);
   const pagedProducts = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE;
+    const start = (safePage - 1) * PAGE_SIZE;
     return filteredProducts.slice(start, start + PAGE_SIZE);
-  }, [filteredProducts, currentPage]);
+  }, [filteredProducts, safePage]);
 
   const onSearch = () => {
     setSubmittedQuery(query);
-    setHasSearched(true);
+    setCurrentPage(1);
+    updateUrl({ query, page: 1 });
   };
 
   const onClearSearch = () => {
     setQuery("");
     setSubmittedQuery("");
-    setHasSearched(false);
+    setCurrentPage(1);
+    updateUrl({ query: "", page: 1 });
+  };
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    updateUrl({ page });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -330,7 +402,7 @@ export function ProductsCatalog({ products }: { products: Product[] }) {
               placeholder="Search SKU, hose ID, valve type, material, or size"
               className="h-14 min-w-0 flex-1 rounded-[3px] border border-slate-300 bg-white px-4 pr-14 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-slate-400"
             />
-            {query || submittedQuery || hasSearched ? (
+            {query || submittedQuery ? (
               <button
                 type="button"
                 aria-label="Clear search"
@@ -370,16 +442,40 @@ export function ProductsCatalog({ products }: { products: Product[] }) {
               </div>
 
               <div className="divide-y divide-slate-200 px-4">
-                {filterGroups.map((group) => (
+                <FilterGroup
+                  title="Product Category"
+                  options={CATEGORIES}
+                  open
+                  selectedValues={selectedCategories}
+                  onChangeOption={handleCategoryChange}
+                />
+                {brandOptions.length > 0 && (
                   <FilterGroup
-                    key={group.title}
-                    title={group.title}
-                    options={group.options}
-                    open={group.open}
-                    selectedValues={selectedFilters[group.title] || []}
-                    onChangeOption={(option, checked) => handleFilterChange(group.title, option, checked)}
+                    title="Brand"
+                    options={brandOptions}
+                    selectedValues={selectedBrands}
+                    onChangeOption={handleBrandChange}
                   />
-                ))}
+                )}
+                {materialGroups.length > 0 && (
+                  <FilterGroup
+                    title="Material"
+                    options={materialGroups.map((m) => m.label)}
+                    selectedValues={selectedMaterialKeys.map(
+                      (key) => materialGroups.find((m) => m.key === key)?.label ?? key,
+                    )}
+                    onChangeOption={(label, checked) => {
+                      const key = materialGroups.find((m) => m.label === label)?.key ?? label;
+                      handleMaterialChange(key, checked);
+                    }}
+                  />
+                )}
+                <FilterGroup
+                  title="Price Range"
+                  options={PRICE_RANGES}
+                  selectedValues={selectedPrices}
+                  onChangeOption={handlePriceChange}
+                />
               </div>
             </div>
           </aside>
@@ -388,7 +484,7 @@ export function ProductsCatalog({ products }: { products: Product[] }) {
             <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-3">
               <div>
                 <p className="text-lg font-semibold tracking-tight text-slate-950">
-                  {hasSearched ? "Results Overview" : "Catalog Overview"}
+                  {submittedQuery || activeFiltersCount > 0 ? "Results Overview" : "Catalog Overview"}
                 </p>
               </div>
               <p className="text-sm font-medium text-slate-500">
@@ -415,24 +511,18 @@ export function ProductsCatalog({ products }: { products: Product[] }) {
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 pt-4">
                 <button
-                  onClick={() => {
-                    setCurrentPage((p) => Math.max(1, p - 1));
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  disabled={currentPage === 1}
+                  onClick={() => goToPage(Math.max(1, safePage - 1))}
+                  disabled={safePage === 1}
                   className="inline-flex h-10 items-center justify-center rounded-[3px] border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Previous
                 </button>
                 <span className="px-2 text-sm font-medium text-slate-600">
-                  Page {currentPage} of {totalPages}
+                  Page {safePage} of {totalPages}
                 </span>
                 <button
-                  onClick={() => {
-                    setCurrentPage((p) => Math.min(totalPages, p + 1));
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  disabled={currentPage === totalPages}
+                  onClick={() => goToPage(Math.min(totalPages, safePage + 1))}
+                  disabled={safePage === totalPages}
                   className="inline-flex h-10 items-center justify-center rounded-[3px] border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Next
