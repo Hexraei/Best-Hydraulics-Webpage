@@ -11,8 +11,16 @@ export type RfqCustomer = {
   message: string;
 };
 
+export type RfqImage = {
+  filename: string;
+  contentType: string;
+  /** Base64-encoded file content, no data-URL prefix. */
+  content: string;
+};
+
 export type RfqPayload = RfqCustomer & {
   lines: CartLineInput[];
+  images?: RfqImage[];
 };
 
 export type ResolvedRfqLine = {
@@ -28,11 +36,15 @@ export type ResolvedRfq = {
   customer: RfqCustomer;
   lines: ResolvedRfqLine[];
   subtotal: number;
+  images: RfqImage[];
 };
 
 const MAX_LINES = 100;
 const MAX_QUANTITY = 100_000;
 const MAX_FIELD_LENGTH = 2000;
+const MAX_IMAGES = 5;
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB per file, before base64 inflation
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
 
 export type RfqValidationError = { field: string; message: string };
 
@@ -122,6 +134,45 @@ export async function resolveRfq(
     });
   }
 
+  const rawImages = Array.isArray(raw.images) ? raw.images : [];
+  const images: RfqImage[] = [];
+
+  if (rawImages.length > MAX_IMAGES) {
+    errors.push({ field: "images", message: `You can attach at most ${MAX_IMAGES} images` });
+  }
+
+  for (const entry of rawImages.slice(0, MAX_IMAGES)) {
+    if (!entry || typeof entry !== "object") {
+      errors.push({ field: "images", message: "Invalid image attachment" });
+      continue;
+    }
+
+    const image = entry as Record<string, unknown>;
+    const filename = asString(image.filename).slice(0, 200) || "image";
+    const contentType = asString(image.contentType);
+    const content = asString(image.content);
+
+    if (!ALLOWED_IMAGE_TYPES.has(contentType)) {
+      errors.push({ field: "images", message: `${filename}: only JPG, PNG, WEBP, or HEIC images are allowed` });
+      continue;
+    }
+
+    if (!content) {
+      errors.push({ field: "images", message: `${filename}: image data is missing` });
+      continue;
+    }
+
+    // Base64 encodes 3 bytes as 4 characters, so this is a quick upper-bound
+    // check on the decoded size without actually decoding it.
+    const approxBytes = (content.length * 3) / 4;
+    if (approxBytes > MAX_IMAGE_BYTES) {
+      errors.push({ field: "images", message: `${filename}: image must be under 5MB` });
+      continue;
+    }
+
+    images.push({ filename, contentType, content });
+  }
+
   if (errors.length > 0) {
     return { ok: false, errors };
   }
@@ -132,6 +183,7 @@ export async function resolveRfq(
       customer,
       lines,
       subtotal: lines.reduce((sum, line) => sum + line.lineTotal, 0),
+      images,
     },
   };
 }
@@ -146,7 +198,7 @@ function escapeHtml(value: string) {
 }
 
 export function renderRfqText(rfq: ResolvedRfq) {
-  const { customer, lines, subtotal } = rfq;
+  const { customer, lines, subtotal, images } = rfq;
 
   const itemLines =
     lines.length > 0
@@ -173,13 +225,14 @@ export function renderRfqText(rfq: ResolvedRfq) {
     itemLines,
     "",
     `Subtotal: ${formatINR(subtotal)}`,
+    images.length > 0 ? `\nAttached images: ${images.length} (see attachments)` : "",
     "",
     `Received: ${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST`,
   ].join("\n");
 }
 
 export function renderRfqHtml(rfq: ResolvedRfq) {
-  const { customer, lines, subtotal } = rfq;
+  const { customer, lines, subtotal, images } = rfq;
 
   const rows =
     lines.length > 0
@@ -241,6 +294,8 @@ export function renderRfqHtml(rfq: ResolvedRfq) {
             </tr>
           </tfoot>
         </table>
+
+        ${images.length > 0 ? `<p style="margin:16px 0 0;color:#0f172a;font-size:13px;">📎 ${images.length} image${images.length > 1 ? "s" : ""} attached to this email.</p>` : ""}
 
         <p style="margin:20px 0 0;color:#64748b;font-size:12px;">
           Received ${escapeHtml(new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }))} IST.

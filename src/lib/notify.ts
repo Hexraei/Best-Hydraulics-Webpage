@@ -57,6 +57,10 @@ export async function sendRfqEmail(rfq: ResolvedRfq): Promise<NotifyResult> {
         subject: `Quote Request — ${rfq.customer.name}${rfq.customer.businessName ? ` (${rfq.customer.businessName})` : ""}`,
         html: renderRfqHtml(rfq),
         text: renderRfqText(rfq),
+        attachments: rfq.images.map((image) => ({
+          filename: image.filename,
+          content: image.content,
+        })),
       }),
     });
 
