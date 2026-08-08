@@ -23,14 +23,15 @@ export async function generateMetadata({
 
   if (!product) {
     return {
-      title: "Product Not Found - Best Hydraulics",
+      title: { absolute: "Product Not Found | Best Hydraulics" },
       description: "The requested industrial product was not found in our catalog.",
       robots: { index: false, follow: true },
     };
   }
 
+  // The root layout's title template appends the brand, so it is not repeated here.
   return {
-    title: `${product.name} | ${product.category} - Best Hydraulics`,
+    title: product.name,
     description: `Buy ${product.name}${product.family ? ` (${product.family})` : ""}. ${product.description} Sourcing spare parts for plant maintenance and OEM procurement.`,
     alternates: { canonical: `/products/${slug}` },
     openGraph: {
@@ -75,7 +76,7 @@ export default async function ProductDetailPage({
 
         <section className="relative overflow-hidden rounded-[4px] border border-slate-200 bg-slate-950">
           <div className="absolute inset-0">
-            <Image src={product.image} alt={product.name} fill priority className="object-cover opacity-45" />
+            <Image src={product.image} alt="" fill priority sizes="100vw" className="object-cover opacity-45" />
             <div className="absolute inset-0 bg-slate-950/65" />
           </div>
 
@@ -95,12 +96,25 @@ export default async function ProductDetailPage({
             <article className="relative overflow-hidden rounded-[4px] border border-slate-200 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
               <div className="grid gap-0 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,0.9fr)]">
                 <div className="relative aspect-[4/3] bg-white p-8">
-                  <Image src={product.image} alt={product.name} fill className="object-contain p-4" />
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 55vw"
+                    className="object-contain p-4"
+                  />
                 </div>
                 <div className="grid gap-3 p-4 sm:grid-cols-3 lg:grid-cols-1">
-                  {product.gallery.map((img) => (
+                  {product.gallery.map((img, index) => (
                     <div key={img} className="relative aspect-[4/3] overflow-hidden bg-white p-4">
-                      <Image src={img} alt={`${product.name} gallery`} fill className="object-contain p-2" />
+                      <Image
+                        src={img}
+                        alt={`${product.name} — view ${index + 2}`}
+                        fill
+                        sizes="(max-width: 1024px) 33vw, 18vw"
+                        className="object-contain p-2"
+                      />
                     </div>
                   ))}
                 </div>

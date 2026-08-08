@@ -59,6 +59,13 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  // Google is verified by DNS TXT; these are a fallback and Bing's primary route.
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    other: {
+      "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION ?? [],
+    },
+  },
 };
 
 export default function RootLayout({
@@ -68,7 +75,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="en-IN"
       className={`${geistSans.variable} ${geistMono.variable} ${brandSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

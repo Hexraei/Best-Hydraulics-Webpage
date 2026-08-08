@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { RequestQuoteForm } from "@/components/request-quote-form";
 
 export const metadata: Metadata = {
-  title: "Contact Us | Sourcing & RFQ Support - Best Hydraulics",
+  title: "Contact & RFQ Support",
   description: "Get in touch with Best Hydraulics for procurement-ready pricing, industrial quotations, and shipping coordination across India.",
   alternates: { canonical: "/contact" },
 };

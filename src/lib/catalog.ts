@@ -1,4 +1,4 @@
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { getDb, hasDatabase } from "@/db";
 import { products as productsTable, variants as variantsTable } from "@/db/schema";
 import { products as staticProducts } from "@/lib/products";
@@ -37,6 +37,7 @@ function toProduct(row: ProductRow, rows: VariantRow[]): Product {
     application: row.application ?? undefined,
     partNumber: row.partNumber ?? undefined,
     hsnCode: row.hsnCode ?? undefined,
+    updatedAt: row.updatedAt?.toISOString(),
   };
 }
 
@@ -97,10 +98,12 @@ export async function getCatalogProductBySlug(slug: string): Promise<Product | u
     const [row] = await db
       .select()
       .from(productsTable)
-      .where(eq(productsTable.slug, slug))
+      .where(and(eq(productsTable.slug, slug), eq(productsTable.published, 1)))
       .limit(1);
 
-    if (!row) return staticProducts.find((product) => product.slug === slug);
+    // A miss on a working database is a genuine 404. Falling back to the seed
+    // catalog here would serve 50 invented products as real, indexable pages.
+    if (!row) return undefined;
 
     const variantRows = await db
       .select()

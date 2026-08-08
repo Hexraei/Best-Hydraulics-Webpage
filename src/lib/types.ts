@@ -24,6 +24,8 @@ export type Product = {
   application?: string;
   partNumber?: string;
   hsnCode?: string;
+  /** ISO timestamp of the last admin edit. Absent for the static seed catalog. */
+  updatedAt?: string;
 };
 
 export type CartLineInput = {

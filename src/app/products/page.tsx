@@ -4,7 +4,7 @@ import { CatalogFallback, ProductsCatalog } from "@/components/products-catalog"
 import { getCatalog } from "@/lib/catalog";
 
 export const metadata: Metadata = {
-  title: "Product Catalogue | Hydraulics, Pneumatics & Industrial Rubber",
+  title: "Hydraulics, Pneumatics & Industrial Rubber",
   description:
     "Browse the Best Hydraulics catalogue of hydraulic hoses and fittings, pneumatic cylinders and valves, and industrial rubber products. Request a quote for bulk and OEM supply.",
   alternates: { canonical: "/products" },
