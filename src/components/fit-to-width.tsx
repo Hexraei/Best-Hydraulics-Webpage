@@ -13,12 +13,11 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
  * Falls back to horizontal scrolling once the content is too wide to shrink
  * further without going below MIN_SCALE.
  *
- * The scaled element is never resized inline — an earlier version set a
- * compensating `width: X%` on it, which fed back into its own measurement and
- * inflated scrollWidth on every pass. Height is left untouched entirely:
- * `transform: scale` shrinks it visually and the browser still reserves the
- * unscaled layout height underneath, which just means normal page scroll for
- * a tall table — exactly the "don't touch vertical" behaviour intended.
+ * Requires the child (e.g. the <table>) to size itself to its own content —
+ * no `w-full`/`width: 100%` on the child itself. If the child stretches to
+ * fill whatever box it's given, scrollWidth always just reports that box's
+ * width back, never the content's true natural width, so overflow can never
+ * be detected and a narrow table never gets to fill its container either.
  */
 const MIN_SCALE = 0.55;
 
@@ -33,8 +32,6 @@ export function FitToWidth({ children }: { children: ReactNode }) {
     if (!container || !content) return;
 
     const measure = () => {
-      // content's own width is intrinsic to its content (a table with fixed
-      // cell sizing), never set by us, so no reset-before-measure is needed.
       const available = container.clientWidth;
       const naturalWidth = content.scrollWidth;
 
@@ -63,21 +60,9 @@ export function FitToWidth({ children }: { children: ReactNode }) {
 
   return (
     <div ref={containerRef} className={stillOverflows ? "w-full overflow-x-auto" : "w-full overflow-hidden"}>
-      {/*
-        A <table> (unlike block content) sizes its columns to whatever box
-        it's given rather than always reporting its true intrinsic width, so
-        it must be measured with room to be as wide as it wants — `inline-block`
-        plus `max-content` lets it size naturally regardless of the scaled
-        wrapper's own box, which is what content.scrollWidth then reads.
-      */}
       <div
         ref={contentRef}
-        style={{
-          display: "inline-block",
-          width: "max-content",
-          maxWidth: "none",
-          ...(scale < 1 ? { transform: `scale(${scale})`, transformOrigin: "top left" } : null),
-        }}
+        style={scale < 1 ? { width: "max-content", transform: `scale(${scale})`, transformOrigin: "top left" } : undefined}
       >
         {children}
       </div>

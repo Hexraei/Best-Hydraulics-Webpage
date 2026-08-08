@@ -146,7 +146,7 @@ export default async function ProductDetailPage({
               <div className="mt-4 rounded-[4px] border border-slate-200">
                 <FitToWidth>
                 {priceGrid ? (
-                  <table className="w-full border-collapse text-sm">
+                  <table className="min-w-full border-collapse text-sm">
                     <thead className="bg-slate-50 text-left text-[0.72rem] uppercase tracking-[0.2em] text-slate-500">
                       <tr>
                         <th className="h-14 w-28 bg-slate-50 p-0 normal-case">
@@ -189,7 +189,7 @@ export default async function ProductDetailPage({
                     </tbody>
                   </table>
                 ) : (
-                  <table className="w-full border-collapse text-sm">
+                  <table className="min-w-full border-collapse text-sm">
                     <thead className="bg-slate-50 text-left text-[0.72rem] uppercase tracking-[0.2em] text-slate-500">
                       <tr>
                         {specColumns.map((column) => (
