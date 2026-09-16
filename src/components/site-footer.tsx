@@ -31,7 +31,7 @@ function BuildingIcon() {
 
 export function SiteFooter() {
   const address =
-    "Kasthuri Complex, No 6 Chann bazzar, Madurai Rd, Tharanallur, Tiruchirappalli, Tamil Nadu 620008";
+    "Alfa Tower, No. 4, Chaan Bazaar, Madurai Road, Tiruchirappalli, Tamil Nadu 620008 (Near Amma Unavagam)";
   const mapsUrl = "https://maps.app.goo.gl/jcB8PWapZWv9ZVhK8";
 
   return (

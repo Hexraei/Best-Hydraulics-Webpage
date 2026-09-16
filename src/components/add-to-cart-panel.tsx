@@ -45,6 +45,10 @@ export function AddToCartPanel({ product }: { product: Product }) {
           <p className="text-right font-semibold text-slate-950">{selected ? formatINR(selected.price) : "-"}</p>
         </div>
 
+        <p className="text-[0.72rem] leading-5 text-slate-500">
+          Except Janatics products, all prices are exclusive of 18% GST, applied additionally at billing. Prices are subject to change without notice.
+        </p>
+
         <div>
           <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-slate-500">Quantity</p>
           <input

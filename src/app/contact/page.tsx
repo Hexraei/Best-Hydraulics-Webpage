@@ -54,7 +54,7 @@ function ContactCard({
 
 export default function ContactPage() {
   const address =
-    "Kasthuri Complex, No 6 Chann bazzar, Madurai Rd, Tharanallur, Tiruchirappalli, Tamil Nadu 620008";
+    "Alfa Tower, No. 4, Chaan Bazaar, Madurai Road, Tiruchirappalli, Tamil Nadu 620008 (Near Amma Unavagam)";
   const mapsUrl = "https://maps.app.goo.gl/jcB8PWapZWv9ZVhK8";
 
   return (
@@ -76,7 +76,7 @@ export default function ContactPage() {
       </section>
 
       <div className="container py-10 lg:py-12">
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid items-start gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <section className="rounded-[4px] border border-slate-200 bg-white p-6 shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
             <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slate-500">Best Hydraulics</p>
             <h2 className="brand-font mt-2 text-3xl font-semibold tracking-tight text-slate-950">Providing reliable spare parts since 2017</h2>
@@ -126,6 +126,16 @@ export default function ContactPage() {
                   </a>
                 </ContactCard>
               </div>
+            </div>
+
+            <div className="mt-6 overflow-hidden rounded-[4px] border border-slate-200">
+              <iframe
+                title="Best Hydraulics location"
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(address)}&output=embed`}
+                className="h-72 w-full"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
           </section>
 

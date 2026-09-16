@@ -161,6 +161,19 @@ export default function CartPage() {
                     Go to Products
                   </Link>
                 </div>
+
+                <dl className="mt-8 grid gap-6 border-t border-slate-100 pt-6 sm:grid-cols-3">
+                  {[
+                    { term: "No minimum order", detail: "Single parts or bulk OEM orders get the same handling." },
+                    { term: "Transparent pricing", detail: "Quoted prices are the prices you pay, no surprises." },
+                    { term: "Fast RFQ turnaround", detail: "We typically respond within 24 hours." },
+                  ].map((item) => (
+                    <div key={item.term}>
+                      <dt className="text-sm font-semibold text-slate-900">{item.term}</dt>
+                      <dd className="mt-1 text-sm leading-6 text-slate-600">{item.detail}</dd>
+                    </div>
+                  ))}
+                </dl>
               </section>
             ) : (
               <div className="space-y-4">
@@ -237,6 +250,9 @@ export default function CartPage() {
                     <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">Subtotal</p>
                     <p className="text-2xl font-semibold tracking-tight text-slate-950">{formatINR(subtotal)}</p>
                   </div>
+                  <p className="mt-2 text-right text-[0.72rem] leading-5 text-slate-500">
+                    Excl. 18% GST (except Janatics products), subject to change.
+                  </p>
                 </div>
               </div>
             )}
