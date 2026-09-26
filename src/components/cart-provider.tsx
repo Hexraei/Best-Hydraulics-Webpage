@@ -38,7 +38,6 @@ function isVariantOption(value: unknown): value is ProductVariant {
   return (
     typeof option.id === "string" &&
     typeof option.price === "number" &&
-    typeof option.stock === "number" &&
     Array.isArray(option.specs)
   );
 }

@@ -49,7 +49,6 @@ function createVariants(productIndex: number) {
         { name: "Color", value: "Black" },
       ],
       price: base,
-      stock: 20 + (productIndex % 14),
     },
     {
       id: `var-${productIndex + 1}-b`,
@@ -58,7 +57,6 @@ function createVariants(productIndex: number) {
         { name: "Color", value: "Blue" },
       ],
       price: base + 240,
-      stock: 14 + (productIndex % 10),
     },
     {
       id: `var-${productIndex + 1}-c`,
@@ -67,7 +65,6 @@ function createVariants(productIndex: number) {
         { name: "Color", value: "Red" },
       ],
       price: base + 520,
-      stock: 9 + (productIndex % 7),
     },
   ];
 }
@@ -98,7 +95,6 @@ export const products: Product[] = Array.from({ length: 50 }, (_, index) => {
     family,
     description:
       "Industrial-grade spare part designed for demanding plant operations. Multiple dimensions, materials, and performance specifications are available for fitment flexibility.",
-    tag: variants.some((variant) => variant.stock > 0) ? "In Stock" : "Out of Stock",
     image: imgA,
     gallery: [imgA, imgB, imgC],
     variants,

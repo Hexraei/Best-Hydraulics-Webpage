@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sendRfqEmail, sendRfqWhatsApp } from "@/lib/notify";
 import { resolveRfq } from "@/lib/rfq";
 import { markDelivery, saveQuoteRequest } from "@/lib/rfq-store";
+import { primaryPhone } from "@/lib/site";
 
 // Notifications go out over the network, so this must run on the Node runtime
 // and must not be statically optimised.
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         message:
-          "We could not submit your request right now. Please call or WhatsApp us on 9994703528 and we will assist you directly.",
+          `We could not submit your request right now. Please call or WhatsApp us on ${primaryPhone} and we will assist you directly.`,
       },
       { status: 502 },
     );

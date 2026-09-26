@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { RequestQuoteForm } from "@/components/request-quote-form";
+import { contact, mapsUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact & RFQ Support",
@@ -53,10 +54,6 @@ function ContactCard({
 }
 
 export default function ContactPage() {
-  const address =
-    "ALFA TOWER, No.4 John Bazaar, (Opp. Raja Theatre Bus Stop), Madurai Road, Trichy - 8";
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-
   return (
     <div className="bg-slate-50/70">
       <section className="relative overflow-hidden border-b border-slate-200 bg-slate-950">
@@ -88,28 +85,22 @@ export default function ContactPage() {
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <ContactCard title="Phone">
                 <div className="space-y-3 text-sm text-slate-100">
-                  <a href="tel:9994703528" className="flex items-center gap-3 transition-colors hover:text-white">
-                    <PhoneIcon />
-                    <span>9994703528</span>
-                  </a>
-                  <a href="tel:9443410833" className="flex items-center gap-3 transition-colors hover:text-white">
-                    <PhoneIcon />
-                    <span>94434 10833</span>
-                  </a>
-                  <a href="tel:9842575335" className="flex items-center gap-3 transition-colors hover:text-white">
-                    <PhoneIcon />
-                    <span>98425 75335</span>
-                  </a>
+                  {contact.phones.map((phone) => (
+                    <a key={phone.tel} href={`tel:${phone.tel}`} className="flex items-center gap-3 transition-colors hover:text-white">
+                      <PhoneIcon />
+                      <span>{phone.display}</span>
+                    </a>
+                  ))}
                 </div>
               </ContactCard>
 
               <ContactCard title="Email and GSTIN">
                 <div className="space-y-3 text-sm text-slate-100">
-                  <a href="mailto:besthydraulicss@gmail.com" className="flex items-center gap-3 transition-colors hover:text-white">
+                  <a href={`mailto:${contact.email}`} className="flex items-center gap-3 transition-colors hover:text-white">
                     <MailIcon />
-                    <span>besthydraulicss@gmail.com</span>
+                    <span>{contact.email}</span>
                   </a>
-                  <p className="text-slate-300">GSTIN: 33ACGPN4781M1Z6</p>
+                  <p className="text-slate-300">GSTIN: {contact.gstin}</p>
                 </div>
               </ContactCard>
 
@@ -122,7 +113,7 @@ export default function ContactPage() {
                     className="flex items-start gap-3 text-sm text-slate-100 transition-colors hover:text-white"
                   >
                     <BuildingIcon />
-                    <span className="leading-6 text-white">{address}</span>
+                    <span className="leading-6 text-white">{contact.address}</span>
                   </a>
                 </ContactCard>
               </div>
@@ -131,7 +122,7 @@ export default function ContactPage() {
             <div className="mt-6 overflow-hidden rounded-[4px] border border-slate-200">
               <iframe
                 title="Best Hydraulics location"
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(address)}&output=embed`}
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(contact.address)}&output=embed`}
                 className="h-72 w-full"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"

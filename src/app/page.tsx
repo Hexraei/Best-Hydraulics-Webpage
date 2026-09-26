@@ -6,7 +6,6 @@ import { IndustrialHeroSlideshow } from "@/components/industrial-hero-slideshow"
 import { ProductCard } from "@/components/product-card";
 import { HeroQuoteForm } from "@/components/hero-quote-form";
 import { getCatalog } from "@/lib/catalog";
-import { siteDescription, siteName, siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -48,27 +47,8 @@ export default async function Home() {
     { value: "24 hr", label: "Typical RFQ Response" },
   ];
 
-  const orgJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: siteName,
-    url: siteUrl,
-    description: siteDescription,
-    foundingDate: "2017",
-    areaServed: "IN",
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Tiruchirappalli",
-      addressCountry: "IN",
-    },
-  };
-
   return (
     <div className="bg-slate-50/70">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
-      />
       <section className="relative overflow-hidden border-b border-slate-200 bg-slate-950">
         <div className="absolute inset-0">
           <IndustrialHeroSlideshow />

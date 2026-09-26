@@ -32,7 +32,7 @@ export default function ShippingPage() {
             <div>
               <h2 className="text-xl font-bold text-slate-900 border-b border-slate-100 pb-2">1. Dispatch Timelines</h2>
               <p className="mt-3">
-                Items marked as <strong>&quot;In Stock&quot;</strong> are typically dispatched within 24 to 48 hours of payment confirmation. Custom hose assemblies, specific variant machining, or vulcanized industrial rubber gaskets require additional processing time (usually 3 to 5 business days).
+                Ready-to-ship items are typically dispatched within 24 to 48 hours of payment confirmation; your quotation will confirm the expected dispatch date. Custom hose assemblies, specific variant machining, or vulcanized industrial rubber gaskets require additional processing time (usually 3 to 5 business days).
               </p>
             </div>
 

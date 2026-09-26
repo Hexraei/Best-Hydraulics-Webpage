@@ -60,7 +60,6 @@ async function main() {
         productId: row.id,
         specs: variant.specs,
         price: variant.price,
-        stock: variant.stock,
         sortOrder: variantIndex,
       })),
     );

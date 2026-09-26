@@ -54,7 +54,6 @@ export function AddToCartPanel({ product }: { product: Product }) {
           <input
             type="number"
             min={1}
-            max={selected?.stock ?? 1}
             value={quantity}
             onChange={(event) => setQuantity(Number(event.target.value))}
             className="mt-2 w-full rounded-[3px] border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400"

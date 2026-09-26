@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, IBM_Plex_Sans } from "next/font/google";
 import { AppShell } from "@/components/app-shell";
 import { CartProvider } from "@/components/cart-provider";
 import { StorefrontChrome } from "@/components/storefront-chrome";
-import { siteDescription, siteName, siteUrl } from "@/lib/site";
+import { contact, siteDescription, siteName, siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -90,14 +90,14 @@ export default function RootLayout({
               description: siteDescription,
               url: siteUrl,
               image: `${siteUrl}/images/hero-catalog.jpg`,
-              telephone: ["+919994703528", "+919443410833", "+919842575335"],
-              email: "besthydraulicss@gmail.com",
+              telephone: contact.phones.map((phone) => `+91${phone.tel}`),
+              email: contact.email,
               address: {
                 "@type": "PostalAddress",
-                streetAddress: "Alfa Tower, No. 4, John Bazaar, Madurai Road (Opp. Raja Theatre Bus Stop)",
-                addressLocality: "Tiruchirappalli",
-                addressRegion: "Tamil Nadu",
-                postalCode: "620008",
+                streetAddress: contact.streetAddress,
+                addressLocality: contact.locality,
+                addressRegion: contact.region,
+                postalCode: contact.postalCode,
                 addressCountry: "IN",
               },
               openingHoursSpecification: [
@@ -126,6 +126,7 @@ export default function RootLayout({
                   closes: "13:00",
                 },
               ],
+              foundingDate: "2017",
               areaServed: "IN",
             }),
           }}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { useCart } from "@/components/cart-provider";
+import { primaryPhone } from "@/lib/site";
 
 function WhatsAppIcon() {
   return (
@@ -162,7 +163,7 @@ export function SiteHeader() {
 
           <div className="flex items-center gap-3">
             <ActionIconLink
-              href="https://wa.me/919994703528"
+              href={`https://wa.me/91${primaryPhone}`}
               label="WhatsApp"
               external
               toneClass="border-emerald-500/30 bg-emerald-500 hover:bg-emerald-600 hover:border-emerald-400/50"
@@ -170,7 +171,7 @@ export function SiteHeader() {
               <WhatsAppIcon />
             </ActionIconLink>
             <ActionIconLink
-              href="tel:9994703528"
+              href={`tel:${primaryPhone}`}
               label="Call"
               toneClass="border-sky-500/30 bg-sky-950 hover:bg-sky-900 hover:border-sky-400/50"
             >

@@ -4,7 +4,6 @@ export type ProductVariant = {
   id: string;
   specs: VariantSpec[];
   price: number;
-  stock: number;
 };
 
 export type Product = {
@@ -14,7 +13,6 @@ export type Product = {
   category: "Hydraulics" | "Pneumatics" | "Industrial Rubber";
   family: string;
   description: string;
-  tag: "In Stock" | "Out of Stock";
   image: string;
   gallery: string[];
   variants: ProductVariant[];

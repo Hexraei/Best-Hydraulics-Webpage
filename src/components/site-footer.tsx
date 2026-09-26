@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { contact, mapsUrl } from "@/lib/site";
 
 function PhoneIcon() {
   return (
@@ -30,10 +31,6 @@ function BuildingIcon() {
 }
 
 export function SiteFooter() {
-  const address =
-    "ALFA TOWER, No.4 John Bazaar, (Opp. Raja Theatre Bus Stop), Madurai Road, Trichy - 8";
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-
   return (
     <footer className="border-t border-slate-800 bg-slate-950 text-slate-200">
       <div className="container grid grid-cols-1 gap-8 py-12 md:grid-cols-4">
@@ -77,24 +74,18 @@ export function SiteFooter() {
           </nav>
         </div>
 
-          <div>
+        <div>
           <h4 className="text-sm font-semibold text-white">Contact Us</h4>
           <div className="mt-3 space-y-3 text-sm text-slate-300">
-            <a href="tel:9994703528" className="flex items-center gap-3 transition-colors hover:text-white">
-              <PhoneIcon />
-              <span>9994703528</span>
-            </a>
-            <a href="tel:9443410833" className="flex items-center gap-3 transition-colors hover:text-white">
-              <PhoneIcon />
-              <span>94434 10833</span>
-            </a>
-            <a href="tel:9842575335" className="flex items-center gap-3 transition-colors hover:text-white">
-              <PhoneIcon />
-              <span>98425 75335</span>
-            </a>
-            <a href="mailto:besthydraulicss@gmail.com" className="flex items-center gap-3 transition-colors hover:text-white">
+            {contact.phones.map((phone) => (
+              <a key={phone.tel} href={`tel:${phone.tel}`} className="flex items-center gap-3 transition-colors hover:text-white">
+                <PhoneIcon />
+                <span>{phone.display}</span>
+              </a>
+            ))}
+            <a href={`mailto:${contact.email}`} className="flex items-center gap-3 transition-colors hover:text-white">
               <MailIcon />
-              <span>besthydraulicss@gmail.com</span>
+              <span>{contact.email}</span>
             </a>
             <a
               href={mapsUrl}
@@ -103,7 +94,7 @@ export function SiteFooter() {
               className="flex items-start gap-3 transition-colors hover:text-white"
             >
               <BuildingIcon />
-              <span className="leading-6">{address}</span>
+              <span className="leading-6">{contact.address}</span>
             </a>
           </div>
         </div>

@@ -5,7 +5,11 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useCart } from "@/components/cart-provider";
 import { formatINR } from "@/lib/currency";
+import { primaryPhone } from "@/lib/site";
 import { orderedSpecs, variantLabel } from "@/lib/specs";
+
+const fieldClass =
+  "h-11 w-full rounded-[3px] border border-white/10 bg-slate-900 px-3 text-sm text-white outline-none placeholder:text-slate-400 focus:border-white/20";
 
 function CartItemImage({ productName, image }: { productName: string; image?: string }) {
   if (!image) {
@@ -16,7 +20,7 @@ function CartItemImage({ productName, image }: { productName: string; image?: st
 }
 
 export default function CartPage() {
-  const { lines, subtotal, updateQuantity, updateVariant, clearCart } = useCart();
+  const { lines, subtotal, updateQuantity, updateVariant, clearCart, hydrated } = useCart();
   const [name, setName] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -33,25 +37,6 @@ export default function CartPage() {
     setSubmitting(true);
 
     try {
-      if (lines.length > 0) {
-        const stockResponse = await fetch("/api/cart/validate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            lines: lines.map((line) => ({
-              productId: line.productId,
-              variantId: line.variantId,
-              quantity: line.quantity,
-            })),
-          }),
-        });
-
-        if (!stockResponse.ok) {
-          const errorData = await stockResponse.json().catch(() => ({}));
-          throw new Error(errorData.message || "Stock validation failed");
-        }
-      }
-
       const response = await fetch("/api/rfq", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -101,8 +86,8 @@ export default function CartPage() {
             </p>
             <p className="mt-2 text-sm leading-6 font-medium text-slate-600">
               Need it urgently? Call us on{" "}
-              <a href="tel:9994703528" className="text-blue-600 hover:text-blue-800">
-                9994703528
+              <a href={`tel:${primaryPhone}`} className="text-blue-600 hover:text-blue-800">
+                {primaryPhone}
               </a>
               .
             </p>
@@ -142,10 +127,15 @@ export default function CartPage() {
               <div>
                 <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-slate-500">Selected items</p>
               </div>
-              <p className="text-sm font-medium text-slate-600">{lines.length} item{lines.length === 1 ? "" : "s"}</p>
+              {hydrated && (
+                <p className="text-sm font-medium text-slate-600">{lines.length} item{lines.length === 1 ? "" : "s"}</p>
+              )}
             </div>
 
-            {lines.length === 0 ? (
+            {/* The server cannot see the saved cart, so render nothing cart-specific until hydration. */}
+            {!hydrated ? (
+              <div className="h-40 animate-pulse rounded-[4px] border border-slate-200 bg-white" />
+            ) : lines.length === 0 ? (
               <section className="rounded-[4px] border border-slate-200 bg-white p-8 shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
                 <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slate-500">Cart status</p>
                 <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Your cart is currently empty</h3>
@@ -208,7 +198,7 @@ export default function CartPage() {
                             <p className="text-lg font-semibold tracking-tight text-slate-950">{formatINR(lineTotal)}</p>
                           </div>
 
-                          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_140px]">
+                          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_140px_auto] sm:items-end">
                             <label className="space-y-2">
                               <span className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
                                 Variant
@@ -232,12 +222,24 @@ export default function CartPage() {
                               </span>
                               <input
                                 type="number"
-                                min={0}
+                                min={1}
                                 value={line.quantity}
-                                onChange={(event) => updateQuantity(line.variantId, Number(event.target.value))}
+                                onChange={(event) => {
+                                  // Ignore the transient empty value while retyping, so the line is not dropped.
+                                  const quantity = Math.floor(Number(event.target.value));
+                                  if (quantity >= 1) updateQuantity(line.variantId, quantity);
+                                }}
                                 className="h-11 w-full rounded-[3px] border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-400"
                               />
                             </label>
+
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(line.variantId, 0)}
+                              className="h-11 rounded-[3px] border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-700"
+                            >
+                              Remove
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -271,7 +273,7 @@ export default function CartPage() {
                     required
                     value={name}
                     onChange={(event) => setName(event.target.value)}
-                    className="h-11 w-full rounded-[3px] border border-white/10 bg-slate-900 px-3 text-sm text-white outline-none placeholder:text-slate-400 focus:border-white/20"
+                    className={fieldClass}
                   />
                 </label>
 
@@ -282,7 +284,7 @@ export default function CartPage() {
                   <input
                     value={businessName}
                     onChange={(event) => setBusinessName(event.target.value)}
-                    className="h-11 w-full rounded-[3px] border border-white/10 bg-slate-900 px-3 text-sm text-white outline-none placeholder:text-slate-400 focus:border-white/20"
+                    className={fieldClass}
                   />
                 </label>
 
@@ -292,7 +294,7 @@ export default function CartPage() {
                     required
                     value={phoneNumber}
                     onChange={(event) => setPhoneNumber(event.target.value)}
-                    className="h-11 w-full rounded-[3px] border border-white/10 bg-slate-900 px-3 text-sm text-white outline-none placeholder:text-slate-400 focus:border-white/20"
+                    className={fieldClass}
                   />
                 </label>
 
@@ -303,7 +305,7 @@ export default function CartPage() {
                     type="email"
                     value={emailId}
                     onChange={(event) => setEmailId(event.target.value)}
-                    className="h-11 w-full rounded-[3px] border border-white/10 bg-slate-900 px-3 text-sm text-white outline-none placeholder:text-slate-400 focus:border-white/20"
+                    className={fieldClass}
                   />
                 </label>
 

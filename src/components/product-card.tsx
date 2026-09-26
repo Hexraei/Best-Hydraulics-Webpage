@@ -1,31 +1,17 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/types";
 import { formatINR } from "@/lib/currency";
 import { BrandBadge } from "@/components/brand-badge";
 
-export function getCategoryImage(category: string) {
-  if (category === "Hydraulics") return "/images/hydraulic-hose.svg";
-  if (category === "Pneumatics") return "/images/pneumatic-cylinder.svg";
-  return "/images/rubber-sheet.svg";
-}
-
-interface ProductCardProps {
-  product: Product;
-  useCategoryImage?: boolean;
-}
-
-export function ProductCard({ product, useCategoryImage = false }: ProductCardProps) {
+export function ProductCard({ product }: { product: Product }) {
   const minPrice = Math.min(...product.variants.map((variant) => variant.price));
-  const imageSrc = useCategoryImage ? getCategoryImage(product.category) : product.image;
 
   return (
     <article className="flex flex-col overflow-hidden rounded-[4px] border border-slate-200 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
       <Link href={`/products/${product.slug}`} className="relative block aspect-[4/3] overflow-hidden bg-white p-6">
         <Image
-          src={imageSrc}
+          src={product.image}
           alt={product.name}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"

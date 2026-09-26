@@ -14,7 +14,6 @@ function toProduct(row: ProductRow, rows: VariantRow[]): Product {
     id: String(variant.id),
     specs: variant.specs,
     price: variant.price,
-    stock: variant.stock,
   }));
 
   const gallery = row.gallery?.length ? row.gallery : [];
@@ -27,7 +26,6 @@ function toProduct(row: ProductRow, rows: VariantRow[]): Product {
     category: row.category as Product["category"],
     family: row.family,
     description: row.description,
-    tag: variants.some((variant) => variant.stock > 0) ? "In Stock" : "Out of Stock",
     image,
     gallery: gallery.length ? gallery : [image],
     variants,
@@ -117,15 +115,4 @@ export async function getCatalogProductBySlug(slug: string): Promise<Product | u
     console.error("[catalog] slug lookup failed, using static products:", error);
     return staticProducts.find((product) => product.slug === slug);
   }
-}
-
-/**
- * Resolves a product/variant pair for cart and RFQ validation, so prices are
- * always read from the source of truth rather than trusted from the client.
- */
-export async function resolveCatalogVariant(productId: string, variantId: string) {
-  const catalog = await getCatalog();
-  const product = catalog.find((item) => item.id === productId);
-  const variant = product?.variants.find((item) => item.id === variantId);
-  return product && variant ? { product, variant } : null;
 }
