@@ -123,15 +123,15 @@ export function HeroQuoteForm() {
 
   if (success) {
     return (
-      <div className="rounded-[4px] border border-white/10 bg-slate-900 p-6 text-center shadow-[0_10px_26px_rgba(15,23,42,0.35)]">
-        <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20 text-xl text-emerald-400">
+      <div className="rounded-[8px] border border-white/10 bg-slate-900/95 p-8 text-center shadow-[0_20px_60px_rgba(2,6,23,0.5)] backdrop-blur-sm">
+        <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-500/15 text-xl text-emerald-400">
           ✓
         </span>
-        <h3 className="mt-3 text-lg font-semibold text-white">Request Sent</h3>
-        <p className="mt-2 text-sm leading-6 text-slate-300">We will call you back shortly.</p>
+        <h3 className="mt-4 text-lg font-semibold text-white">Request Sent</h3>
+        <p className="mt-2 text-sm leading-6 text-slate-400">We will call you back shortly.</p>
         <button
           onClick={() => setSuccess(false)}
-          className="mt-4 inline-flex h-10 items-center justify-center rounded-[3px] border border-white/15 bg-transparent px-4 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+          className="mt-5 inline-flex h-10 items-center justify-center rounded-[3px] border border-white/15 bg-transparent px-4 text-sm font-medium text-white transition-colors hover:bg-slate-800"
         >
           Send Another Request
         </button>
@@ -140,14 +140,14 @@ export function HeroQuoteForm() {
   }
 
   return (
-    <div>
-      <p className="mb-4 text-center text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+    <div className="rounded-[8px] border border-white/10 bg-slate-900/95 p-6 shadow-[0_20px_60px_rgba(2,6,23,0.5)] backdrop-blur-sm sm:p-7">
+      <p className="text-center text-2xl font-semibold tracking-tight text-white sm:text-[1.75rem]">
         Get a Callback
       </p>
-      <form
-        onSubmit={handleSubmit}
-        className="rounded-[6px] border border-white/10 bg-slate-900 p-5 shadow-[0_10px_26px_rgba(15,23,42,0.35)]"
-      >
+      <p className="mt-1.5 text-center text-sm text-slate-400">
+        Tell us what you need — we&apos;ll call you back with pricing.
+      </p>
+      <form onSubmit={handleSubmit} className="mt-6">
       <div className="space-y-3">
         <input
           required

@@ -94,7 +94,7 @@ export default function RootLayout({
               email: "besthydraulicss@gmail.com",
               address: {
                 "@type": "PostalAddress",
-                streetAddress: "Kasthuri Complex, No 6 Chann bazzar, Madurai Rd, Tharanallur",
+                streetAddress: "Alfa Tower, No. 4, John Bazaar, Madurai Road (Opp. Raja Theatre Bus Stop)",
                 addressLocality: "Tiruchirappalli",
                 addressRegion: "Tamil Nadu",
                 postalCode: "620008",

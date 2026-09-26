@@ -31,8 +31,8 @@ function BuildingIcon() {
 
 export function SiteFooter() {
   const address =
-    "Kasthuri Complex, No 6 Chann bazzar, Madurai Rd, Tharanallur, Tiruchirappalli, Tamil Nadu 620008";
-  const mapsUrl = "https://maps.app.goo.gl/jcB8PWapZWv9ZVhK8";
+    "ALFA TOWER, No.4 John Bazaar, (Opp. Raja Theatre Bus Stop), Madurai Road, Trichy - 8";
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
   return (
     <footer className="border-t border-slate-800 bg-slate-950 text-slate-200">
