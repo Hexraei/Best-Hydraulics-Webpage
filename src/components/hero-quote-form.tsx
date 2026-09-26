@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import { CheckIcon, CloseIcon, PaperclipIcon } from "@/components/icons";
 
 const MAX_IMAGES = 5;
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -124,8 +125,8 @@ export function HeroQuoteForm() {
   if (success) {
     return (
       <div className="rounded-[8px] border border-white/10 bg-slate-900/95 p-8 text-center shadow-[0_20px_60px_rgba(2,6,23,0.5)] backdrop-blur-sm">
-        <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-500/15 text-xl text-emerald-400">
-          ✓
+        <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400">
+          <CheckIcon className="h-5 w-5" />
         </span>
         <h3 className="mt-4 text-lg font-semibold text-white">Request Sent</h3>
         <p className="mt-2 text-sm leading-6 text-slate-400">We will call you back shortly.</p>
@@ -187,7 +188,7 @@ export function HeroQuoteForm() {
             disabled={images.length >= MAX_IMAGES}
             className="flex h-11 w-full items-center justify-center gap-2 rounded-[3px] border border-dashed border-white/20 bg-slate-800/50 px-3 text-sm text-slate-300 transition-colors hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <span aria-hidden="true">📎</span>
+            <PaperclipIcon className="h-4 w-4" />
             {images.length > 0 ? `Add more images (${images.length}/${MAX_IMAGES})` : "Attach images (optional, up to 5)"}
           </button>
 
@@ -201,9 +202,9 @@ export function HeroQuoteForm() {
                     type="button"
                     onClick={() => removeImage(index)}
                     aria-label={`Remove ${image.file.name}`}
-                    className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-slate-950/80 text-[10px] text-white transition-opacity hover:bg-red-600"
+                    className="absolute right-0.5 top-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-slate-950/80 text-white transition-colors hover:bg-red-600"
                   >
-                    ✕
+                    <CloseIcon className="h-3.5 w-3.5" />
                   </button>
                 </div>
               ))}

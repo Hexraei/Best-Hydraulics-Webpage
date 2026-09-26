@@ -295,7 +295,7 @@ export function renderRfqHtml(rfq: ResolvedRfq) {
           </tfoot>
         </table>
 
-        ${images.length > 0 ? `<p style="margin:16px 0 0;color:#0f172a;font-size:13px;">📎 ${images.length} image${images.length > 1 ? "s" : ""} attached to this email.</p>` : ""}
+        ${images.length > 0 ? `<p style="margin:16px 0 0;color:#0f172a;font-size:13px;">${images.length} image${images.length > 1 ? "s" : ""} attached to this email.</p>` : ""}
 
         <p style="margin:20px 0 0;color:#64748b;font-size:12px;">
           Received ${escapeHtml(new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }))} IST.

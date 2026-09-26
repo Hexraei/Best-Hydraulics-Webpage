@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { AlertIcon, CheckIcon } from "@/components/icons";
 
 /**
  * Customer-details-only quote request — no cart line items. Posts to the same
@@ -56,8 +57,8 @@ export function RequestQuoteForm() {
   if (success) {
     return (
       <div className="rounded-[4px] border border-slate-200 bg-white p-8 text-center shadow-[0_10px_26px_rgba(15,23,42,0.05)]">
-        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-2xl text-emerald-600">
-          ✓
+        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+          <CheckIcon className="h-6 w-6" />
         </span>
         <h3 className="mt-4 text-2xl font-semibold tracking-tight text-slate-950">Quote Request Sent</h3>
         <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -149,9 +150,10 @@ export function RequestQuoteForm() {
         {errorMsg && (
           <div
             role="alert"
-            className="rounded-[3px] border border-red-200 bg-red-950 p-3 text-xs font-semibold text-red-200"
+            className="flex items-start gap-2 rounded-[3px] border border-red-200 bg-red-950 p-3 text-xs font-semibold text-red-200"
           >
-            ⚠️ {errorMsg}
+            <AlertIcon className="h-4 w-4" />
+            <span>{errorMsg}</span>
           </div>
         )}
 

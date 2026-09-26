@@ -8,7 +8,7 @@ Follow this brief for any UI work. If something here conflicts with a generic ae
 
 - **Logo**: `images/brand/best-hydraulics-mark.png` is the transparent full-resolution emblem (hose fan with red ring); `best-hydraulics-mark.webp` (400px tall) is what the site serves. The source artwork is `images/brand logos/final logo.png`.
 - **Lockup**: the emblem is the only image; "BEST HYDRAULICS" and "Solution of Hydraulics" are live text (`src/components/brand-lockup.tsx`). Never place the flattened logo PNG with its white background on a page.
-- **Logo type**: Saira Italic (Google Fonts, `wdth` axis) — "BEST" weight 900 at 125% width, "HYDRAULICS" weight 800 at 90% width, tagline weight 300 at 87% width with +0.06em tracking between thin red rules. Use Saira only for the logo lockup; it is not a UI font.
+- **Logo type**: Saira Italic (Google Fonts, `wdth` axis) — "BEST" weight 900 at 125% width, "HYDRAULICS" weight 800 at 90% width, tagline weight 300 at 87% width with +0.06em tracking between thin red rules. Load it from `src/lib/fonts.ts` (`logoFont`). Use it only for the wordmark — the hero lockup and the header brand text (wordmark only, no emblem, in the header) — never as a UI font.
 
 ## Colour
 
@@ -51,7 +51,7 @@ Follow this brief for any UI work. If something here conflicts with a generic ae
 
 ## Avoid
 
-- Emoji as icons or status marks; use inline SVG icons that match the stroke style of the header/footer icons.
+- Emoji as icons or status marks; use the line icons in `src/components/icons.tsx` (or add one there in the same 1.8 stroke style).
 - Gradient text, glassmorphism, neon glows, decorative blobs, or animated gradients.
 - Centred-everything hero layouts and identical three-card feature rows with generic icons.
 - Filler copy ("Unlock the power of…", "Seamless", "Revolutionize").
@@ -59,7 +59,6 @@ Follow this brief for any UI work. If something here conflicts with a generic ae
 
 ## Known debt
 
-- Emoji remain in the quote forms: `✓` success marks and `⚠️` error prefixes (`src/app/cart/page.tsx`, `src/components/request-quote-form.tsx`, `src/components/hero-quote-form.tsx`), plus `📎` and `✕` in the hero form's attachment UI. Replace them with SVG icons.
 - Many products show "Not Available" for description, HSN code, and part number — a catalogue data gap, not a layout problem.
 
 ## Verification

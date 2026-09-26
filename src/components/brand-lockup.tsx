@@ -1,10 +1,6 @@
 import Image from "next/image";
-import { Saira } from "next/font/google";
 import mark from "../../images/brand/best-hydraulics-mark.webp";
-
-// Saira Italic is the closest Google Font to the logo's wordmark: expanded width
-// matches "BEST", semi-condensed matches "HYDRAULICS", light matches the tagline.
-const saira = Saira({ subsets: ["latin"], style: "italic", axes: ["wdth"], display: "swap" });
+import { logoFont } from "@/lib/fonts";
 
 /** Hero logo lockup: the emblem is the only image; the wordmark and tagline are live text. */
 export function BrandLockup() {
@@ -18,7 +14,7 @@ export function BrandLockup() {
         className="h-[88px] w-auto shrink-0 sm:h-[130px] xl:h-[170px]"
       />
 
-      <div className={`${saira.className} inline-flex flex-col`}>
+      <div className={`${logoFont.className} inline-flex flex-col`}>
         <h1 className="whitespace-nowrap text-[1.55rem] leading-none uppercase sm:text-[2.35rem] xl:text-[3.1rem]">
           <span className="font-black text-brand-red-bright [font-stretch:125%]">Best</span>{" "}
           <span className="font-extrabold text-white [font-stretch:90%]">Hydraulics</span>

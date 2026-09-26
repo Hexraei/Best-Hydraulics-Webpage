@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { useCart } from "@/components/cart-provider";
+import { logoFont } from "@/lib/fonts";
 import { primaryPhone } from "@/lib/site";
 
 function WhatsAppIcon() {
@@ -156,8 +157,9 @@ export function SiteHeader() {
       <div className="border-b border-slate-800/70">
         <div className="container flex h-16 items-center justify-between gap-4">
           <Link href="/" className="flex items-center text-white">
-            <span className="brand-font text-[1.08rem] font-semibold tracking-[0.03em] sm:text-[1.2rem]">
-              Best Hydraulics
+            <span className={`${logoFont.className} text-[1.2rem] leading-none whitespace-nowrap uppercase sm:text-[1.4rem] lg:text-[1.6rem]`}>
+              <span className="font-black text-brand-red-bright [font-stretch:125%]">Best</span>{" "}
+              <span className="font-extrabold text-white [font-stretch:90%]">Hydraulics</span>
             </span>
           </Link>
 
