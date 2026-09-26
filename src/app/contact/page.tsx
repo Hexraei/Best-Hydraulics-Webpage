@@ -54,8 +54,8 @@ function ContactCard({
 
 export default function ContactPage() {
   const address =
-    "Alfa Tower, No. 4, Chaan Bazaar, Madurai Road, Tiruchirappalli, Tamil Nadu 620008 (Near Amma Unavagam)";
-  const mapsUrl = "https://maps.app.goo.gl/jcB8PWapZWv9ZVhK8";
+    "ALFA TOWER, No.4 John Bazaar, (Opp. Raja Theatre Bus Stop), Madurai Road, Trichy - 8";
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
   return (
     <div className="bg-slate-50/70">

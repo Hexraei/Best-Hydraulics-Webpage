@@ -94,7 +94,7 @@ export default function RootLayout({
               email: "besthydraulicss@gmail.com",
               address: {
                 "@type": "PostalAddress",
-                streetAddress: "Alfa Tower, No. 4, Chaan Bazaar, Madurai Road (Near Amma Unavagam)",
+                streetAddress: "Alfa Tower, No. 4, John Bazaar, Madurai Road (Opp. Raja Theatre Bus Stop)",
                 addressLocality: "Tiruchirappalli",
                 addressRegion: "Tamil Nadu",
                 postalCode: "620008",
