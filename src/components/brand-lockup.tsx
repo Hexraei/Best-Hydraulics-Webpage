@@ -19,8 +19,8 @@ export function BrandLockup() {
       />
 
       <div className={`${saira.className} inline-flex flex-col`}>
-        <h1 className="flex items-baseline gap-[0.24em] whitespace-nowrap text-[1.55rem] leading-none uppercase sm:text-[2.35rem] xl:text-[3.1rem]">
-          <span className="font-black text-brand-red-bright [font-stretch:125%]">Best</span>
+        <h1 className="whitespace-nowrap text-[1.55rem] leading-none uppercase sm:text-[2.35rem] xl:text-[3.1rem]">
+          <span className="font-black text-brand-red-bright [font-stretch:125%]">Best</span>{" "}
           <span className="font-extrabold text-white [font-stretch:90%]">Hydraulics</span>
         </h1>
         <p className="mt-[0.55em] flex items-center gap-[0.6em] text-[0.74rem] font-light tracking-[0.06em] whitespace-nowrap text-slate-200 [font-stretch:87%] sm:text-[1.13rem] xl:text-[1.49rem]">
