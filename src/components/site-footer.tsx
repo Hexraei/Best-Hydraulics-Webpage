@@ -3,7 +3,7 @@ import { contact, mapsUrl } from "@/lib/site";
 
 function PhoneIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-none stroke-current stroke-[2]">
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 shrink-0 fill-none stroke-current stroke-[2]">
       <path d="M4.5 5.5c0 8.28 5.72 13.5 13 13.5l1.5-3.2-3.9-1.65-1.55 2.1c-2.55-.52-5.03-3-5.55-5.55l2.1-1.55L8.45 5.25 5.25 6.75C5 6.28 4.5 5.92 4.5 5.5Z" />
     </svg>
   );
@@ -11,7 +11,7 @@ function PhoneIcon() {
 
 function MailIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-none stroke-current stroke-[2]">
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 shrink-0 fill-none stroke-current stroke-[2]">
       <rect x="4.5" y="6" width="15" height="12" rx="1.5" />
       <path d="m5 7 7 6 7-6" />
     </svg>
@@ -20,7 +20,7 @@ function MailIcon() {
 
 function BuildingIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-none stroke-current stroke-[2]">
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 shrink-0 fill-none stroke-current stroke-[2]">
       <path d="M5 20V4.5h9.5L19 9v11H5Z" />
       <path d="M14.5 4.5V9H19" />
       <path d="M8 20v-4h3v4" />
@@ -33,7 +33,7 @@ function BuildingIcon() {
 export function SiteFooter() {
   return (
     <footer className="border-t border-slate-800 bg-slate-950 text-slate-200">
-      <div className="container grid grid-cols-1 gap-8 py-12 md:grid-cols-4">
+      <div className="container grid grid-cols-1 gap-8 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <h3 className="brand-font text-lg font-semibold text-white">Best Hydraulics</h3>
           <p className="mt-2 max-w-md text-sm leading-6 text-slate-300">
@@ -85,7 +85,7 @@ export function SiteFooter() {
             ))}
             <a href={`mailto:${contact.email}`} className="flex items-center gap-3 transition-colors hover:text-white">
               <MailIcon />
-              <span>{contact.email}</span>
+              <span className="min-w-0 [overflow-wrap:anywhere]">{contact.email}</span>
             </a>
             <a
               href={mapsUrl}

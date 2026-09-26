@@ -15,6 +15,9 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-brand: var(--font-brand-sans);
+  /* Logo red (#A20201) for light surfaces; the brightened tint keeps 4.3:1 contrast on the dark navy hero. */
+  --color-brand-red: #a20201;
+  --color-brand-red-bright: #e2221e;
 }
 
 body {
@@ -32,9 +35,16 @@ a {
   text-decoration: none;
 }
 
+/* 100% (not 100vw) so the desktop scrollbar does not eat the side gutter. */
 .container {
   margin: 0 auto;
-  width: min(1320px, calc(100vw - 1.25rem));
+  width: min(1320px, calc(100% - 2rem));
+}
+
+@media (min-width: 1024px) {
+  .container {
+    width: min(1320px, calc(100% - 4rem));
+  }
 }
 
 

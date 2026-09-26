@@ -5,6 +5,7 @@ import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import { IndustrialHeroSlideshow } from "@/components/industrial-hero-slideshow";
 import { ProductCard } from "@/components/product-card";
 import { HeroQuoteForm } from "@/components/hero-quote-form";
+import { BrandLockup } from "@/components/brand-lockup";
 import { getCatalog } from "@/lib/catalog";
 
 export const metadata: Metadata = {
@@ -62,9 +63,9 @@ export default async function Home() {
               <p className="text-[0.72rem] font-semibold uppercase tracking-[0.26em] text-slate-200/82">
                 Proving Trust since 2017
               </p>
-              <h1 className="mt-4 text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl lg:text-7xl">
-                Best Hydraulics
-              </h1>
+              <div className="mt-5">
+                <BrandLockup />
+              </div>
               <p className="mt-5 max-w-xl text-sm leading-7 text-slate-200/95 sm:text-base">
                 We supply hydraulic, pneumatic, and industrial rubber components to maintenance teams and OEM
                 buyers across India. Tell us the part you need, and we will source it, price it, and deliver it.

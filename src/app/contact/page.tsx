@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 function PhoneIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-none stroke-current stroke-[1.7]">
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 shrink-0 fill-none stroke-current stroke-[1.7]">
       <path d="M5.5 4.8c.3-.6 1-.9 1.7-.8l2.3.5c.6.1 1 .5 1.2 1.1l.7 2.3c.2.6 0 1.2-.4 1.6l-1.5 1.5c1 1.9 2.5 3.4 4.5 4.5l1.5-1.5c.4-.4 1-.6 1.6-.4l2.3.7c.6.2 1 .6 1.1 1.2l.5 2.3c.1.7-.2 1.4-.8 1.7-.8.4-1.8.6-3 .4-2.9-.4-5.7-1.9-8.2-4.4s-4-5.3-4.4-8.2c-.2-1.2 0-2.2.4-3Z" />
     </svg>
   );
@@ -19,7 +19,7 @@ function PhoneIcon() {
 
 function MailIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-none stroke-current stroke-[1.7]">
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 shrink-0 fill-none stroke-current stroke-[1.7]">
       <rect x="4.5" y="6" width="15" height="12" rx="1.5" />
       <path d="m5 7 7 6 7-6" />
     </svg>
@@ -28,7 +28,7 @@ function MailIcon() {
 
 function BuildingIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 fill-none stroke-white stroke-[1.8]">
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 shrink-0 fill-none stroke-white stroke-[1.8]">
       <path d="M5 20V4.5h9.5L19 9v11H5Z" />
       <path d="M14.5 4.5V9H19" />
       <path d="M8 20v-4h3v4" />

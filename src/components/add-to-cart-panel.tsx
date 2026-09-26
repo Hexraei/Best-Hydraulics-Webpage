@@ -11,12 +11,13 @@ export function AddToCartPanel({ product }: { product: Product }) {
   const attributeNames = useMemo(() => selectableSpecNames(product.variants), [product.variants]);
   const [selection, setSelection] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
-  const { addToCart, isVariantInCart } = useCart();
+  const { addToCart, isVariantInCart, hydrated } = useCart();
 
   const resolved = resolveVariantSelection(product.variants, attributeNames, selection);
   const selected = resolved.variant ?? product.variants[0];
 
-  const isAdded = selected ? isVariantInCart(selected.id) : false;
+  // The server cannot see the saved cart; decide "Go to Cart" only after hydration.
+  const isAdded = hydrated && selected ? isVariantInCart(selected.id) : false;
 
   return (
     <div className="overflow-hidden rounded-[4px] border border-slate-200 bg-white p-5 shadow-[0_10px_26px_rgba(15,23,42,0.04)]">
